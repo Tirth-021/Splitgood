@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+    {% block style %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/add_group.css' %}">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+        {#        <script defer src="{% static 'js/add_expense.js' %}"></script>#}
+    {% endblock %}
+</head>
+<body>
+
+{% block content %}
+    <div class="add_group">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="/split/process_expense/" method="POST">
+                    {% csrf_token %}
+                    <fieldset>
+                        <legend><span class="number"></span> Add Expense</legend>
+
+                        <label for="group">Group Name:</label>
+                        <input type="hidden" name="group_id" value="{{ group_id }}">
+                        <input type="text" name="group" id="group" value="{{ group.group_name }}" disabled>
+
+                        <label for="expensename">Expense Name:</label>
+                        <input type="text" id="expensename" name="expense_name" placeholder="For ex. Pizza Party">
+
+                        <label for="date">Expense Date:</label>
+                        <input type="date" id="date" name="date">
+
+                        <label for="amount">Amount:</label>
+                        <input type="number" id="amount" name="amount">
+
+                        <label for="split_type">Split as:</label>
+                        <select onchange="Split_unequally()" name="split_type" id="split_type">
+                            <option value="split_equally">Split Equally</option>
+                            <option value="split_ratio">Split by Ratio</option>
+                            <option value="split_unequally">Split Unequally</option>
+                        </select>
+
+                        <label for="people">People:</label>
+                        <select id="people" class="js-example-basic-multiple" name="users"
+                                multiple selected="{{ request.user }}">
+                            {% for user in users %}
+                                <option value="{{ user }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="extra" name="extra" style="display: none">
+
+                            <table id="edit_me" class="highlight">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td class="editable">
+                                            <input type="text" name="une_users" value="{{ user.username }}" readonly="true">
+                                        </td>
+                                        <td><input type="text" name="une_value_{{ user.id }}"
+                                                                          id="une_value_{{ user.id }}"
+                                                                          class="editable_value" placeholder="0">
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <div id="extra_ratio" name="extra" style="display: none">
+
+                            <table id="edit_me" class="highlight">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Percentage</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td class="editable">
+                                            <input type="text" name="r_users" value="{{ user.username }}" readonly="true">
+                                        </td>
+                                        <td ><input type="text" name="une_percentage_{{ user.id }}"
+                                                                          id="uner_percentage_{{ user.id }}"
+                                                                         class="editable_r_percentage" placeholder="0" onchange="give_value()">
+                                        </td>
+                                        <td><input type="text" name="une_r_value_{{ user.id }}"
+                                                                           class="editable_r_value" id="uner_value_{{ user.id }}"
+                                                                            placeholder="0">
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </fieldset>
+
+
+                    <button type="submit" id="create_expense" onclick="return check()">Create</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $('.js-example-basic-multiple').select2();
+
+        });
+
+
+    </script>
+
+    <script>
+
+        function Split_unequally() {
+            if (document.getElementById('split_type').value == 'split_unequally') {
+                document.getElementById('extra').style.display = '';
+                document.getElementById('people').disabled = true;
+                 document.getElementById('extra_ratio').style.display = 'none';
+                document.getElementById('people').disabled = true;
+            }
+            else if (document.getElementById('split_type').value == 'split_ratio'){
+                document.getElementById('extra').style.display = 'none';
+                document.getElementById('people').disabled = true;
+                document.getElementById('extra_ratio').style.display = '';
+                document.getElementById('people').disabled = true;
+
+            }
+            else {
+                document.getElementById('extra').style.display = 'none';
+                document.getElementById('extra_ratio').style.display = 'none';
+                document.getElementById('people').disabled = false;
+            }
+
+
+        }
+
+
+
+
+        function check(){
+            console.log("Inside submit")
+            if (document.getElementById('split_type').value == 'split_ratio'){
+                return check_total_percentage();
+            }
+            if (document.getElementById('split_type').value == 'split_unequally'){
+                return check_total();
+            }
+        }
+
+        function check_total() {
+
+            console.log("inside check total")
+            var sum = 0
+            var amount = parseInt(document.getElementById('amount').value);
+
+
+
+            var length = document.getElementsByClassName('editable_value').length
+            console.log(length)
+            for(var i = 0; i < length; i++) {
+
+                var value=$('input[type="text"].editable_value')[i].value;
+                console.log(value)
+
+                sum+=parseInt(value)
+
+                }
+            if(sum != amount){
+                    alert("Total amount does not match");
+                    return false;
+                }
+
+
+            }
+
+
+
+        function give_value() {
+
+
+            var amount = parseInt(document.getElementById('amount').value);
+
+
+            var length = document.getElementsByClassName('editable_r_value').length
+
+            for(var i = 0; i < length; i++) {
+
+                    var percentage = $('input[type="text"].editable_r_percentage')[i].value
+                    var value = amount*percentage/100
+                    $('input[type="text"].editable_r_value')[i].value = value
+
+            }
+
+            }
+
+           function check_total_percentage() {
+
+            console.log("inside check total percentage")
+            var sum = 0
+            var length = document.getElementsByClassName('editable_r_percentage').length
+            console.log(length)
+            for(var i = 0; i < length; i++) {
+
+                var value=$('input[type="text"].editable_r_percentage')[i].value;
+                console.log(value)
+
+                sum+=parseInt(value)
+
+                }
+            if(sum != 100){
+                    alert("Total percentage does not match");
+                    return false;
+                }
+
+
+            }
+
+
+
+    </script>
+
+{% endblock %}
+
+
+</body>
+
+</html>
