@@ -32,17 +32,29 @@ def process_expense(request):
     expense_name = request.POST.get('expense_name')
     amount = request.POST.get('amount')
     group = request.POST.get('group_id')
-    users_lst = request.POST.getlist('users')
-    uneuser = request.POST.getlist('une_users')
+    users_lst = request.POST.getlist('users_selected')
+    uneuser = request.POST.getlist('une_users_selected')
     date = parse_datetime(request.POST.get('date'))
     g = Group.objects.filter(id=group)[0]
-    r_user = request.POST.getlist('r_users')
+    r_user = request.POST.getlist('r_users_selected')
     print(uneuser)
     print(r_user)
-    member_list=[]
-    for i in g.users.exclude(username=request.user.username):
-        member_list.append(i.id)
+
+    member_list = []
+    if len(r_user)>0:
+        for i in r_user:
+            us = User.objects.get(username=i)
+            print(us)
+            member_list.append(us.id)
+    if len(uneuser)>0:
+        for i in uneuser:
+            us = User.objects.get(username=i)
+            print(us)
+            member_list.append(us.id)
+
+    print(member_list)
     users = []
+    breakpoint()
     uneusers = []
     r_users = []
     for i in users_lst:

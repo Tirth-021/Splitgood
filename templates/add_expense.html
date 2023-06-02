@@ -36,24 +36,47 @@
                         <input type="number" id="amount" name="amount">
 
                         <label for="split_type">Split as:</label>
-                        <select onchange="Split_unequally()" name="split_type" id="split_type">
+                        <select onclick="Split_unequally()" name="split_type" id="split_type">
                             <option value="split_equally">Split Equally</option>
-                            <option value="split_ratio">Split by Ratio</option>
+                            <option value="split_ratio">Split by Percentage</option>
                             <option value="split_unequally">Split Unequally</option>
                         </select>
 
-                        <label for="people">People:</label>
-                        <select id="people" class="js-example-basic-multiple" name="users"
-                                multiple selected="{{ request.user }}">
-                            {% for user in users %}
-                                <option value="{{ user }}">{{ user.username }}</option>
-                            {% endfor %}
-                        </select>
+
+                         <div id="people" name="extra" style="display: none">
+
+                            <table id="edit_me" class="highlight">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for user in users %}
+                                    <tr>
+
+                                        <td><input type="checkbox" name="users_selected" value="{{ user.username }}" >
+                                        </td>
+                                         <td class="editable">
+                                            <input type="text" name="une_users" value="{{ user.username }}" readonly="true">
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+
+                        </div>
                         <div id="extra" name="extra" style="display: none">
 
                             <table id="edit_me" class="highlight">
                                 <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Name</th>
                                     <th>Amount</th>
                                     <th></th>
@@ -63,6 +86,7 @@
                                 <tbody>
                                 {% for user in users %}
                                     <tr>
+                                        <td><input type="checkbox" name="une_users_selected" value="{{ user.username }}" ></td>
                                         <td class="editable">
                                             <input type="text" name="une_users" value="{{ user.username }}" readonly="true">
                                         </td>
@@ -84,22 +108,26 @@
                             <table id="edit_me" class="highlight">
                                 <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Name</th>
                                     <th>Percentage</th>
                                     <th>Amount</th>
                                     <th></th>
+
                                 </tr>
                                 </thead>
 
                                 <tbody>
                                 {% for user in users %}
                                     <tr>
+
+                                        <td><input type="checkbox" name="r_users_selected" value="{{ user.username }}" ></td>
                                         <td class="editable">
                                             <input type="text" name="r_users" value="{{ user.username }}" readonly="true">
                                         </td>
                                         <td ><input type="text" name="une_percentage_{{ user.id }}"
                                                                           id="uner_percentage_{{ user.id }}"
-                                                                         class="editable_r_percentage" placeholder="0" onchange="give_value()">
+                                                                          class="editable_r_percentage" placeholder="0" onchange="give_value()">
                                         </td>
                                         <td><input type="text" name="une_r_value_{{ user.id }}"
                                                                            class="editable_r_value" id="uner_value_{{ user.id }}"
@@ -141,21 +169,22 @@
         function Split_unequally() {
             if (document.getElementById('split_type').value == 'split_unequally') {
                 document.getElementById('extra').style.display = '';
-                document.getElementById('people').disabled = true;
+                document.getElementById('people').style.display = 'none';
                  document.getElementById('extra_ratio').style.display = 'none';
-                document.getElementById('people').disabled = true;
+                document.getElementById('people').style.display = 'none';
             }
             else if (document.getElementById('split_type').value == 'split_ratio'){
                 document.getElementById('extra').style.display = 'none';
-                document.getElementById('people').disabled = true;
+                {#document.getElementById('people').disabled = true;#}
                 document.getElementById('extra_ratio').style.display = '';
-                document.getElementById('people').disabled = true;
+                document.getElementById('people').style.display = 'none';
 
             }
             else {
+                document.getElementById('people').style.display = '';
                 document.getElementById('extra').style.display = 'none';
                 document.getElementById('extra_ratio').style.display = 'none';
-                document.getElementById('people').disabled = false;
+                {#document.getElementById('people').disabled = false;#}
             }
 
 
@@ -178,7 +207,7 @@
 
             console.log("inside check total")
             var sum = 0
-            var amount = parseInt(document.getElementById('amount').value);
+            var amount = parseFloat(document.getElementById('amount').value);
 
 
 
@@ -225,15 +254,22 @@
             console.log("inside check total percentage")
             var sum = 0
             var length = document.getElementsByClassName('editable_r_percentage').length
-            console.log(length)
+
             for(var i = 0; i < length; i++) {
 
-                var value=$('input[type="text"].editable_r_percentage')[i].value;
+                if($('input[type="text"].editable_r_percentage')[i].value==""){
+                    var value=0;
+                }
+                else{
+                    var value=$('input[type="text"].editable_r_percentage')[i].value;
+                }
+
                 console.log(value)
 
-                sum+=parseInt(value)
+                sum+=parseFloat(value)
 
                 }
+            console.log(sum)
             if(sum != 100){
                     alert("Total percentage does not match");
                     return false;
