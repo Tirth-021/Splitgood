@@ -14,6 +14,9 @@ class Expense(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     users = models.ManyToManyField(User)
     created_at = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now=True)
+    is_deleted = models.BooleanField(default=False)
+
 
     class Meta:
         db_table = 'expense'
@@ -28,7 +31,7 @@ class Lender(models.Model):
 
 
 class Borrower(models.Model):
-    borrowers = models.ManyToManyField(User)
+    borrowers = models.ForeignKey(User, on_delete=models.CASCADE)
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE)
     lender = models.ForeignKey(Lender, on_delete=models.CASCADE)
     borrows = models.IntegerField()

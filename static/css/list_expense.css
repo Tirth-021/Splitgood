@@ -35,7 +35,8 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
   align-items: start;
   font-size: 62.5%;
-  height: 25rem;
+  height: 33rem;
+  margin: 2rem;
 }
 @media (max-width: 60em) {
   .grid {
@@ -89,6 +90,7 @@ body {
   border-radius: 0.4rem;
   transition: 0.2s;
   cursor: pointer;
+  margin: 1.5rem;
 }
 .card__btn span {
   margin-left: 1rem;
