@@ -22,6 +22,8 @@
         <p class="card__text">{{ date }}</p>
           <p class="card__text">You Own {{ lends }}</p>
         <button class="card__btn"><a href="/split/add_expense"> Add another Expense </a><span>&rarr;</span></button>
+          <p><input type="hidden" value="{{ expense.id }}" name="expense_id"></p>
+          <button class="card__btn"><a href="/split/edit_expense/?expense={{ expense.id }}"> Edit Expense </a><span>&rarr;</span></button>
       </div>
     </div>
   </div>
