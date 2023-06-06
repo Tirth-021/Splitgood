@@ -176,7 +176,7 @@ def edit_page(request):
     date = expense.created_at.date().strftime("%Y-%m-%d")
     print(date)
     amount = expense.amount
-
+    breakpoint()
     group_rec = expense.group_id
     group_id = Group.objects.filter(id=group_rec)[0]
     members = group_id.users.all()
@@ -310,14 +310,14 @@ def edit_expense(request):
 
         lender.save()
         j = 0
-        users_lst.remove(request.user.username)
-        for i in user_list:
+        uneuser.remove(request.user.username)
+        for i in uneuser:
             if i in user_list:
                 borrower = Borrower.objects.filter(expense_id=expense_id)[j]
                 borrower.expense = expense
                 borrower.borrowers = User.objects.filter(username=i)[0]
                 borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-                borrower.borrows = request.POST.get('une_value_' + str(member_list[i]))
+                borrower.borrows = request.POST.get('une_value_' + str(member_list[j]))
                 borrower.expense_name = expense_name
                 borrower.save()
             else:
@@ -325,7 +325,7 @@ def edit_expense(request):
                 borrower.expense = expense
                 borrower.borrowers = User.objects.filter(username=i)[0]
                 borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-                borrower.borrows = request.POST.get('une_value_' + str(member_list[i]))
+                borrower.borrows = request.POST.get('une_value_' + str(member_list[j]))
                 borrower.expense_name = expense_name
                 borrower.save()
 
@@ -342,29 +342,31 @@ def edit_expense(request):
         for user in r_users:
             expense.users.add(user[0])
 
-        lender = Lender.objects.filter(expense_id=expense_id)
+        lender = Lender.objects.filter(expense_id=expense_id)[0]
         lender.expense = expense
         lender.lender = User.objects.filter(id=request.user.id)[0]
         lender.lends = int(amount) - int(own_amount)
         lender.expense_name = expense_name
 
         lender.save()
-        users_lst.remove(request.user.username)
-        for i in user_list:
+        j = 0
+        r_user.remove(request.user.username)
+        for i in r_user:
             if i in user_list:
                 borrower = Borrower.objects.filter(expense_id=expense_id)[j]
                 borrower.expense = expense
                 borrower.borrowers = User.objects.filter(username=i)[0]
                 borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-                borrower.borrows = request.POST.get('une_value_' + str(member_list[i]))
+                borrower.borrows = request.POST.get('une_r_value_' + str(member_list[j]))
                 borrower.expense_name = expense_name
                 borrower.save()
             else:
+                print("Inside else")
                 borrower = Borrower()
                 borrower.expense = expense
                 borrower.borrowers = User.objects.filter(username=i)[0]
                 borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-                borrower.borrows = request.POST.get('une_value_' + str(member_list[i]))
+                borrower.borrows = request.POST.get('une_r_value_' + str(member_list[j]))
                 borrower.expense_name = expense_name
                 borrower.save()
 
