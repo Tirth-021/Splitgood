@@ -23,7 +23,7 @@ def registration(request):
         user.set_password(password)
         user.email = email
         user.save()
-        print("Registration successful")
+
 
     return render(request, "home.html")
 
@@ -33,9 +33,6 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        if user is None:
-            # return redirect('registration')
-            print("Error Occurred")
         login(request, user)
     return render(request, "dashboard.html")
 
@@ -44,5 +41,4 @@ def login_view(request):
 @never_cache
 def logout_view(request):
     logout(request)
-    print("Logout successful")
     return render(request, "home.html")
