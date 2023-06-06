@@ -5,11 +5,9 @@ from django.shortcuts import render
 from group.models import Group
 
 
-# Create your views here.
-
 def group_view(request):
     users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))
-    print(users)
+
     data = {'users': users}
     return render(request, 'add_group.html', context={'users': users})
 
@@ -21,7 +19,7 @@ def create_group(request):
     users = []
     for i in users_lst:
         users.append(User.objects.filter(username=i))
-    print(users)
+
 
     group = Group()
     group.created_by = request.user
