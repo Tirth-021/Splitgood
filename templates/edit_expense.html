@@ -3,12 +3,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Splitgood</title>
-    {% block style %}
+    <title>SplitGood</title>
+     {% block style %}
         {% load static %}
         <link rel="stylesheet" href="{% static 'css/add_group.css' %}">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-        {#        <script defer src="{% static 'js/add_expense.js' %}"></script>#}
     {% endblock %}
 </head>
 <body>
@@ -17,23 +16,24 @@
     <div class="add_group">
         <div class="row">
             <div class="col-md-12">
-                <form action="/split/process_expense/" method="POST">
+                <form action="/split/process_edit/" method="POST">
                     {% csrf_token %}
                     <fieldset>
                         <legend><span class="number"></span> Add Expense</legend>
 
                         <label for="group">Group Name:</label>
-                        <input type="hidden" name="group_id" value="{{ group_id }}">
-                        <input type="text" name="group" id="group" value="{{ group.group_name }}" disabled>
+                        <input type="hidden" name="expense_id" value="{{ expense_id }}">
+                        <input type="hidden" name="group_id" value="{{ group_id.id }}">
+                        <input type="text" name="group" id="group" value="{{ group_id.group_name }}" disabled>
 
                         <label for="expensename">Expense Name:</label>
-                        <input type="text" id="expensename" name="expense_name" placeholder="For ex. Pizza Party">
+                        <input type="text" id="expensename" name="expense_name" value="{{ expense_name }}">
 
                         <label for="date">Expense Date:</label>
-                        <input type="date" id="date" name="date">
+                        <input type="date" id="date" name="date" value="{{ date }}">
 
                         <label for="amount">Amount:</label>
-                        <input type="number" id="amount" name="amount">
+                        <input type="number" id="amount" name="amount" value="{{ amount }}">
 
                         <label for="split_type">Split as:</label>
                         <select onclick="Split_unequally()" name="split_type" id="split_type">
@@ -144,7 +144,7 @@
                     </fieldset>
 
 
-                    <button type="submit" id="create_expense" onclick="return check()">Create</button>
+                    <button type="submit" id="create_expense" onclick="return check()">Update</button>
 
                 </form>
             </div>
@@ -284,7 +284,5 @@
 
 {% endblock %}
 
-
 </body>
-
 </html>
