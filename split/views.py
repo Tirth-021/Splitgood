@@ -1,6 +1,3 @@
-import datetime
-import json
-
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.utils.dateparse import parse_datetime
@@ -9,7 +6,7 @@ from group.models import Group
 from split.models import Expense, Lender, Borrower
 
 
-# Create your views here.
+
 
 def add_expense(request):
     group_info = Group.objects.filter(users=request.user)
@@ -20,10 +17,7 @@ def add_expense(request):
 def split_expense(request):
     group_id = request.GET.get('group_id')
     group = Group.objects.filter(id=group_id)
-    print(group[0].users.all())
     ids = group[0].users.all().values('id')
-    # ids = users.objects.values('id')[0]
-    print(ids)
     return render(request, 'add_expense.html',
                   context={'group_id': group_id, 'group': group[0], 'users': group[0].users.all(), 'ids': ids})
 
@@ -38,24 +32,20 @@ def process_expense(request):
     date = parse_datetime(request.POST.get('date'))
     g = Group.objects.filter(id=group)[0]
     r_user = request.POST.getlist('r_users_selected')
-    print(uneuser)
-    print(r_user)
 
     member_list = []
     if len(r_user) > 0:
         for i in r_user:
             us = User.objects.get(username=i)
-            print(us)
+
             member_list.append(us.id)
     if len(uneuser) > 0:
         for i in uneuser:
             us = User.objects.get(username=i)
-            print(us)
+
             member_list.append(us.id)
 
-    print(member_list)
     users = []
-
     uneusers = []
     r_users = []
     for i in users_lst:
@@ -74,12 +64,12 @@ def process_expense(request):
     expense.save()
 
     if split_type == 'split_equally':
-        print("Inside split_equally")
+
         for user in users:
             expense.users.add(user[0])
-        # expense.save()
+
         per_person_amount = int(amount) / (len(users))
-        print(per_person_amount)
+
         lender = Lender()
         lender.expense = expense
         lender.lender = User.objects.filter(id=request.user.id)[0]
@@ -87,7 +77,7 @@ def process_expense(request):
         lender.expense_name = expense_name
 
         lender.save()
-        # for i in range(0, len(users) - 1):
+
         for i in users_lst:
             borrower = Borrower()
             borrower.expense = expense
@@ -96,8 +86,7 @@ def process_expense(request):
             borrower.borrows = per_person_amount
             borrower.expense_name = expense_name
             borrower.save()
-        # for user in users:
-        #     borrower.borrowers.add(user[0])
+
         own_delete = Borrower.objects.get(borrowers_id=request.user.id)
         own_delete.delete()
 
@@ -107,11 +96,11 @@ def process_expense(request):
         return render(request, 'list_expenses.html', context)
 
     if split_type == 'split_unequally':
-        print("Inside split_unequally")
+
         own_amount = request.POST.get('une_value_' + str(request.user.id))
         for user in uneusers:
             expense.users.add(user[0])
-        # expense.save()
+
         lender = Lender()
         lender.expense = expense
         lender.lender = User.objects.filter(id=request.user.id)[0]
@@ -136,7 +125,7 @@ def process_expense(request):
         return render(request, 'list_expenses.html', context)
 
     if split_type == 'split_ratio':
-        print("Inside split_ratio")
+
         own_amount = request.POST.get('une_r_value_' + str(request.user.id))
         for user in r_users:
             expense.users.add(user[0])
@@ -168,15 +157,15 @@ def process_expense(request):
 def edit_page(request):
     expense_id = request.GET.get('expense')
 
-    print(expense_id)
+
     expense = Expense.objects.filter(id=expense_id)[0]
-    print(expense)
+
     expense_name = expense.expense_name
-    print(expense_name)
+
     date = expense.created_at.date().strftime("%Y-%m-%d")
-    print(date)
+
     amount = expense.amount
-    breakpoint()
+
     group_rec = expense.group_id
     group_id = Group.objects.filter(id=group_rec)[0]
     members = group_id.users.all()
@@ -203,7 +192,6 @@ def edit_expense(request):
     if len(users_lst) > 0:
         for i in users_lst:
             us = User.objects.get(username=i)
-            print(us)
             member_list.append(us.id)
         for j in prev_users:
             prev_username = User.objects.get(id=j.borrowers_id).username
@@ -212,7 +200,6 @@ def edit_expense(request):
     if len(r_user) > 0:
         for i in r_user:
             us = User.objects.get(username=i)
-            print(us)
             member_list.append(us.id)
         for j in prev_users:
             prev_username = User.objects.get(id=j.borrowers_id).username
@@ -220,15 +207,12 @@ def edit_expense(request):
     if len(uneuser) > 0:
         for i in uneuser:
             us = User.objects.get(username=i)
-            print(us)
             member_list.append(us.id)
         for j in prev_users:
             prev_username = User.objects.get(id=j.borrowers_id).username
             user_list.append(prev_username)
-    breakpoint()
-    print(member_list)
-    users = []
 
+    users = []
     uneusers = []
     r_users = []
     for i in users_lst:
@@ -241,7 +225,7 @@ def edit_expense(request):
     username = str(current_user.username)
 
     expense = Expense.objects.get(id=expense_id)
-    print(expense)
+
 
     expense.expense_name = expense_name
     expense.amount = amount
@@ -249,15 +233,14 @@ def edit_expense(request):
     expense.save()
 
     if split_type == 'split_equally':
-        print("Inside split_equally edit")
+
         for user in users:
             expense.users.add(user[0])
 
         per_person_amount = int(amount) / (len(users))
-        print(per_person_amount)
+
         lender = Lender.objects.filter(expense_id=expense_id)[0]
         lender.expense = expense
-        # lender.lender = User.objects.filter(id=request.user.id)[0]
         lender.lends = per_person_amount * (len(users) - 1)
         lender.expense_name = expense_name
 
@@ -266,7 +249,6 @@ def edit_expense(request):
         users_lst.remove(request.user.username)
 
         for i in users_lst:
-            print(j)
 
             if i in user_list:
                 borrower = Borrower.objects.filter(expense_id=expense_id)[j]
@@ -284,12 +266,7 @@ def edit_expense(request):
                 borrower.borrows = per_person_amount
                 borrower.expense_name = expense_name
                 borrower.save()
-
-            breakpoint()
-
             j = j + 1
-
-
 
         context = {'expense_name': expense_name, 'date': date, 'lends': per_person_amount * (len(users) - 1),
                    'expense': expense}
@@ -297,14 +274,13 @@ def edit_expense(request):
         return render(request, 'list_expenses.html', context)
 
     if split_type == 'split_unequally':
-        print("Inside split_unequally")
+
         own_amount = request.POST.get('une_value_' + str(request.user.id))
         for user in uneusers:
             expense.users.add(user[0])
-        # expense.save()
+
         lender = Lender.objects.filter(expense_id=expense.id)[0]
         lender.expense = expense
-        # lender.lender = User.objects.filter(id=request.user.id)[0]
         lender.lends = int(amount) - int(own_amount)
         lender.expense_name = expense_name
 
@@ -337,7 +313,6 @@ def edit_expense(request):
         return render(request, 'list_expenses.html', context)
 
     if split_type == 'split_ratio':
-        print("Inside split_ratio edit")
         own_amount = request.POST.get('une_r_value_' + str(request.user.id))
         for user in r_users:
             expense.users.add(user[0])
@@ -361,7 +336,6 @@ def edit_expense(request):
                 borrower.expense_name = expense_name
                 borrower.save()
             else:
-                print("Inside else")
                 borrower = Borrower()
                 borrower.expense = expense
                 borrower.borrowers = User.objects.filter(username=i)[0]
