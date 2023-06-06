@@ -18,17 +18,17 @@ def registration(request):
         print(username)
         password = request.POST.get('password')
         email = request.POST.get('email')
-
         user = User.objects.create_user(username)
         user.set_password(password)
         user.email = email
         user.save()
 
-
     return render(request, "home.html")
+
 
 def dashboard(request):
     return render(request, "dashboard.html")
+
 
 def login_view(request):
     if request.method == 'POST':
