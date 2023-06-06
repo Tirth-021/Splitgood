@@ -55,7 +55,7 @@ table {
 }
 
 .bg-green, .btn-primary {
-  background-color: #6dea9e;
+  background-color: #7C5CfC;
 }
 
 .bg-blue {
@@ -91,7 +91,7 @@ table {
   color: #0f0f0f;
 }
 .btn-primary:hover, .btn-primary:active {
-  background-color: #6dea9fda;
+  background-color: #7C5CfC;
 }
 
 .main {
@@ -161,7 +161,7 @@ table {
     height: auto;
     grid-column: auto;
     grid-row: auto;
-    grid-template-rows: repeat(2, calc($header-height + 10vh)) repeat(2, 1fr) 70px;
+    /*grid-template-rows: repeat(2, calc($header-height + 10vh)) repeat(2, 1fr) 70px;*/
   }
 }
 
@@ -222,6 +222,7 @@ table {
   width: 100%;
   height: 500px;
   overflow-y: scroll;
+  padding: 12px;
 }
 @media screen and (max-width: 700px) {
   .scroll-check {

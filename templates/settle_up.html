@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="{% static 'css/settle_up.css' %}">
     {% endblock %}
 </head>
+<body>
 {% block content %}
 <main class="main">
     <header class="header">
@@ -30,49 +31,33 @@
                 <sup class="sup">$</sup><span class="data-info__amount text-lg">1,747</span>
             </div>
         </div>
-{#        <div class="data-info data-info--light">#}
-{#            <h6 class="data-info__heading">next payment</h6>#}
-{#            <div class="data-info__content">#}
-{#                <sup class="sup">$</sup><span class="data-info__amount text-lg">235</span>#}
-{#            </div>#}
-{#            <div class="data-info__tag">Want to pay less?</div>#}
-{#        </div>#}
-{#        <div class="data-info data-info--light">#}
-{#            <h6 class="data-info__heading">next payment due</h6>#}
-{#            <div class="data-info__content">#}
-{#                <span class="data-info__amount text-lg">12 May</span>#}
-{#            </div>#}
-{#            <div class="data-info__tag">Autopay Scheduled</div>#}
-{#        </div>#}
-{#        <button class="btn btn-primary">Make Payment Now</button>#}
+
     </section>
     <section class="data-body">
         <div class="scroll-check">
             <table id="data-table">
                 <thead>
                 <tr class="table__row--header">
-{#                    <th><span class="header__title">ID</span></th>#}
-                    <th><span class="header__title">Group</span></th>
-                    <th><span class="header__title">Expense Name</span></th>
-                    <th><span class="header__title">Date</span></th>
+                    <th><span class="header__title">Name</span></th>
                     <th><span class="header__title">Amount</span></th>
                     <th></th>
                 </tr>
                 </thead>
 
                 <tbody class="table__body">
+                {% for user, amount in borrow_list  %}
                 <tr class="table__row">
-                    <td><span class="id">{{ group_name }}</span></td>
-                    <td><span class="merchant">{{ expense_name }}</span></td>
-                    <td><span class="date">{{ date }}</span></td>
-                    <td><span class="price">{{ amount }}</span></td>
-                    <td><button class="settle_up"><a href="split/process_settle/">Settle up</a></button></td>
-                </tr>
 
+                    <td><span class="id">{{ user }}</span></td>
+                    <td><span class="merchant">{{ amount }}</span></td>
+                    <td><a href="split/process_settle/"><button class="btn-primary">Settle up</button></a></td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
     </section>
 </main>
 {% endblock %}
+</body>
 </html>
