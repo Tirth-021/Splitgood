@@ -45,12 +45,12 @@
                 </thead>
 
                 <tbody class="table__body">
-                {% for user, amount in borrow_list  %}
+                {% for user, amount,id in borrow_list  %}
                 <tr class="table__row">
 
                     <td><span class="id">{{ user }}</span></td>
                     <td><span class="merchant">{{ amount }}</span></td>
-                    <td><a href="split/process_settle/"><button class="btn-primary">Settle up</button></a></td>
+                    <td><a href="/settle/process_settle/?id={{ id }}&amount={{ amount }}&group={{ group }}"><button class="btn-primary">Settle up</button></a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -58,6 +58,8 @@
         </div>
     </section>
 </main>
+
+
 {% endblock %}
 </body>
 </html>

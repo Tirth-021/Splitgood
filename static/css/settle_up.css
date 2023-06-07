@@ -32,6 +32,8 @@ button {
   font-family: "Poppins", sans-serif;
   cursor: pointer;
   background: transparent;
+  padding: 19px 39px 18px 39px;
+  font-size: large;
 }
 
 th {
@@ -246,6 +248,7 @@ table {
   padding: 1rem 0;
   text-transform: capitalize;
   font-weight: 400;
+  margin-right: 260px;
 }
 #data-table .table__row {
   height: 4rem;
@@ -272,3 +275,7 @@ table {
     display: none;
   }
 }
+
+
+
+

@@ -37,3 +37,4 @@ class Borrower(models.Model):
     borrows = models.IntegerField()
     expense_name = models.CharField(max_length=30, default="")
     is_paid = models.BooleanField(default=False)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
