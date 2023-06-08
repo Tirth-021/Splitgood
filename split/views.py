@@ -111,6 +111,7 @@ def process_expense(request):
 
         lender.save()
         j = 0
+
         for i in uneuser:
             borrower = Borrower()
             borrower.expense = expense
@@ -142,7 +143,7 @@ def process_expense(request):
         lender.expense_name = expense_name
 
         lender.save()
-        j = 0
+        j=0
         for i in r_user:
             borrower = Borrower()
             borrower.expense = expense
