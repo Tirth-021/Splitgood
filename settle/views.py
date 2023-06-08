@@ -5,6 +5,7 @@ from django.shortcuts import render
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 
+from activites.models import Activities
 from group.models import Group
 from django.shortcuts import render
 
@@ -25,7 +26,7 @@ def settle_view(request):
     amount = []
     lender = []
     lender_id = []
-    expense = list(Expense.objects.filter(Q(group=group) & Q(users=request.user)).values_list('id', flat=True))
+    expense = list(Expense.objects.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id', flat=True))
     borrower = list(
         Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
             'lender').annotate(
@@ -79,16 +80,31 @@ def process_payment(request):
         for i in borrow_transaction:
             i.is_paid = True
             i.save()
+        activity = Activities()
+        activity.activity = "Paid"
+        activity.amount = int(amount)
+        g = Group.objects.get(group=group)
+        activity.group = g
+        activity.user = request.user
+        activity.save()
 
         return render(request, 'payment_online.html', context=context)
     else:
         lender_id = request.POST.get('lender_id')
         group = request.POST.get('group')
+        amount = request.POST.get('amount')
         borrow_transaction = Borrower.objects.filter(
             Q(borrowers=request.user.id) & Q(lender=lender_id) & Q(is_paid=False) & Q(group=group))
         for i in borrow_transaction:
             i.is_paid = True
             i.save()
+        activity = Activities()
+        activity.activity = "Paid"
+        activity.amount = int(amount)
+        g = Group.objects.get(group=group)
+        activity.group = g
+        activity.user = request.user
+        activity.save()
         return render(request, 'dashboard.html')
 
 

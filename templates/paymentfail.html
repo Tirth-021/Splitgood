@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+    {% block style %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/paymentfail.css' %}">
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+
+    <div class="container">
+  <div class="ui middle aligned center aligned grid">
+    <div class="ui eight wide column">
+
+      <form class="ui large form">
+
+          <div class="ui icon negative message">
+            <i class="warning icon"></i>
+            <div class="content">
+              <div class="header">
+                Oops! Something went wrong.
+              </div>
+              <p>While trying to make payment</p>
+            </div>
+
+         </div>
+
+          <span class="ui large teal submit fluid button">Try again</span>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+</body>
+</html>

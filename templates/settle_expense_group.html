@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+</head>
+<body>
+{% block content %}
+    <h2>Select Group</h2>
+
+    <div class="list-group">
+        {% for i in groups %}
+            <button type="button" class="btn btn-primary btn-lg active">
+                <a href="/settle/transactions?group_id={{ i.id }}">{{ i.group_name }}</a></button>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
+</body>
+</html>
