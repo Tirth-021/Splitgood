@@ -17,13 +17,11 @@ class Expense(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
 
-
     class Meta:
         db_table = 'expense'
 
 
 class Lender(models.Model):
-
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE)
     lender = models.ForeignKey(User, on_delete=models.CASCADE)
     lends = models.IntegerField()
@@ -36,3 +34,4 @@ class Borrower(models.Model):
     lender = models.ForeignKey(Lender, on_delete=models.CASCADE)
     borrows = models.IntegerField()
     expense_name = models.CharField(max_length=30, default="")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)

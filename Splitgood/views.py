@@ -6,8 +6,8 @@ from django.contrib.auth import logout, authenticate, login
 from django.views.decorators.cache import cache_control, never_cache
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@never_cache
+# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
+# @never_cache
 def home(request):
     return render(request, "home.html")
 
