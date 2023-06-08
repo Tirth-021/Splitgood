@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+
 from .views import home, registration, login_view, logout_view, dashboard
 
 urlpatterns = [
@@ -27,5 +29,6 @@ urlpatterns = [
     path("logout/", logout_view),
     path('group/', include('group.urls')),
     path('split/', include('split.urls')),
+    path('settle/', include('settle.urls')),
 
 ]

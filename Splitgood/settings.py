@@ -108,6 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
+RAZOR_KEY_ID = 'rzp_test_1uITbiqTyyvX1P'
+
+RAZOR_KEY_SECRET = 'wHznDjoe3Eyg4iWUizuNMahA'
 
 LANGUAGE_CODE = "en-us"
 

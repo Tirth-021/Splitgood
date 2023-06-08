@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+
+    {% block style %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/settle_up.css' %}">
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+<main class="main">
+    <header class="header">
+        <nav class="nav">
+            <span class="page-title text-lg">Transactions</span>
+        </nav>
+    </header>
+    <section class="data-summary">
+        <div class="data-info bg-yellow">
+            <h6 class="data-info__heading">Paid</h6>
+            <div class="data-info__content">
+                <sup class="sup">$</sup><span class="data-info__amount text-lg">1,253</span>
+            </div>
+        </div>
+        <div class="data-info bg-blue">
+            <h6 class="data-info__heading">left</h6>
+            <div class="data-info__content">
+                <sup class="sup">$</sup><span class="data-info__amount text-lg">1,747</span>
+            </div>
+        </div>
+
+    </section>
+    {% if length == 0 %}
+    <h3 class="settled">You are all Settled up</h3>
+
+    {% else %}
+    <section class="data-body">
+        <div class="scroll-check">
+            <table id="data-table">
+                <thead>
+                <tr class="table__row--header">
+                    <th><span class="header__title">Name</span></th>
+                    <th><span class="header__title">Amount</span></th>
+                    <th></th>
+                </tr>
+                </thead>
+
+                <tbody class="table__body">
+                {% for user, amount,id in borrow_list  %}
+                <tr class="table__row">
+
+                    <td><span class="id">{{ user }}</span></td>
+                    <td><span class="merchant">{{ amount }}</span></td>
+                    <td><a href="/settle/process_settle/?id={{ id }}&amount={{ amount }}&group={{ group }}"><button class="btn-primary">Settle up</button></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+{% endif %}
+
+{% endblock %}
+</body>
+</html>

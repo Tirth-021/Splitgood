@@ -151,6 +151,7 @@ def process_expense(request):
             borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
             borrower.borrows = request.POST.get('une_r_value_' + str(member_list[j]))
             borrower.expense_name = expense_name
+            borrower.group = g
             borrower.save()
             j = j+1
         own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
