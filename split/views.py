@@ -110,17 +110,17 @@ def process_expense(request):
         lender.expense_name = expense_name
 
         lender.save()
-        for i in range(len(uneusers) - 1):
+        for i in uneuser:
             borrower = Borrower()
             borrower.expense = expense
+            borrower.borrowers = User.objects.filter(username=i)[0]
             borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
             borrower.borrows = request.POST.get('une_value_' + str(member_list[i]))
             borrower.expense_name = expense_name
             borrower.group = g
             borrower.save()
-        for user in uneusers:
-            borrower.borrowers.add(user[0])
-        borrower.borrowers.remove(request.user)
+        own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
+        own_delete.delete()
 
         context = {'expense_name': expense_name, 'date': date, 'lends': (int(amount) - int(own_amount)),
                    'expense': expense}
@@ -143,14 +143,14 @@ def process_expense(request):
         for i in range(len(r_users) - 1):
             borrower = Borrower()
             borrower.expense = expense
+            borrower.borrowers = User.objects.filter(username=i)[0]
             borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
             borrower.borrows = request.POST.get('une_r_value_' + str(member_list[i]))
             borrower.expense_name = expense_name
             borrower.group = g
             borrower.save()
-        for user in r_users:
-            borrower.borrowers.add(user[0])
-        borrower.borrowers.remove(request.user)
+        own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
+        own_delete.delete()
 
         context = {'expense_name': expense_name, 'date': date, 'lends': (int(amount) - int(own_amount)),
                    'expense': expense}
