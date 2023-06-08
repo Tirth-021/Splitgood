@@ -33,6 +33,10 @@
         </div>
 
     </section>
+    {% if length == 0 %}
+    <h3 class="settled">You are all Settled up</h3>
+
+    {% else %}
     <section class="data-body">
         <div class="scroll-check">
             <table id="data-table">
@@ -58,7 +62,7 @@
         </div>
     </section>
 </main>
-
+{% endif %}
 
 {% endblock %}
 </body>

@@ -36,15 +36,16 @@ def settle_view(request):
         amount.append(item[1])
         lender_id.append(item[2])
     borrow_list = zip(lender, amount, lender_id)
-    context = {'borrow_list': borrow_list,'group': group}
+    length = len(lender_id)
+    context = {'borrow_list': borrow_list, 'group': group, 'length': length}
     return render(request, 'settle_up.html', context)
 
 
 def process_settle(request):
     lender_id = request.GET.get('id')
     amount = request.GET.get('amount')
-    group= request.GET.get('group')
-    context = {'lender_id': lender_id, 'amount': amount,'group':group}
+    group = request.GET.get('group')
+    context = {'lender_id': lender_id, 'amount': amount, 'group': group}
 
     return render(request, 'payments.html', context)
 
