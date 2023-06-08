@@ -329,12 +329,7 @@ tr > td {
     padding: 8px 0;
 }
 
-/*tr > td:first-child {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    gap: 9px;*/
-/*    padding: 28px 86px;*/
-/*}*/
+
 
 .status {
     margin-right: 8px;
