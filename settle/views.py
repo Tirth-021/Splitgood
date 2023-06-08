@@ -52,7 +52,6 @@ def process_settle(request):
 def process_payment(request):
     payment_method = request.POST.get('payment-method')
     if payment_method == 'online':
-        print("inside if")
         lender_id = request.POST.get('lender_id')
         amount = request.POST.get('amount')
         group = request.POST.get('group')
