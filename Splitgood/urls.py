@@ -23,7 +23,7 @@ from .views import home, registration, login_view, logout_view, dashboard
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home),
-    path("home/", dashboard),
+    path("home/", dashboard, name="home"),
     path("registration/", registration),
     path("login/", login_view),
     path("logout/", logout_view),

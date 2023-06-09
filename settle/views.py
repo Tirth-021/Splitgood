@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
 from django.shortcuts import render
@@ -106,6 +107,7 @@ def process_payment(request):
         activity.user = request.user
         activity.paid_to = Lender.objects.filter(id=lender_id)[0]
         activity.save()
+        messages.success(request, "You are settled up.")
         return render(request, 'dashboard.html')
 
 
@@ -128,14 +130,7 @@ def paymenthandler(request):
         result = razorpay_client.utility.verify_payment_signature(
             params_dict)
         if result is not None:
-            # amount =   # Rs. 200
-            # amount =
-
-            # capture the payemt
-            # razorpay_client.payment.capture(payment_id)
-
-            # render success page on successful caputre of payment
-
+            messages.success(request, "You are settled up.")
             return render(request, 'dashboard.html')
         else:
 
