@@ -1,5 +1,4 @@
 from django import template
-import datetime
 
 register = template.Library()
 
@@ -12,3 +11,8 @@ def give_date(date_string):
 @register.filter(name='give_month')
 def give_date(date_string):
     return date_string.strftime('%b')
+
+
+@register.filter(name='check_user')
+def check_user(username, request_user):
+    return "You" if username == request_user else username

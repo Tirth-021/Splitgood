@@ -101,9 +101,10 @@ def process_payment(request):
         activity = Activities()
         activity.activity = "Paid"
         activity.amount = int(amount)
-        g = Group.objects.get(group=group)
+        g = Group.objects.get(id=group)
         activity.group = g
         activity.user = request.user
+        activity.paid_to = Lender.objects.filter(id=lender_id)[0]
         activity.save()
         return render(request, 'dashboard.html')
 

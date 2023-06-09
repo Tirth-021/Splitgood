@@ -230,9 +230,9 @@
                             <input type="text" id="projectname" name="group_name" placeholder="For ex. Apna Khata">
 
 
-                            <label for="job">People:</label>
-                            <select id="job" class="js-example-basic-multiple selectfield" name="users"
-                                    multiple="multiple" selected="{{ request.user }}">
+                            <label for="People">People:</label>
+                            <select id="people" class="js-example-basic-multiple selectfield" name="users"
+                                    multiple="multiple">
                                 {% for user in users %}
                                     <option value="{{ user }}">{{ user.username }}</option>
                                 {% endfor %}
@@ -245,7 +245,7 @@
 
                         </fieldset>
 
-                        <button type="submit">Add Expense</button>
+                        <button type="submit">Create Group</button>
 
                     </form>
                 </div>

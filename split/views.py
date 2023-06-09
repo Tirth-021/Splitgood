@@ -250,7 +250,7 @@ def edit_expense(request):
     activity.group = g
     activity.user = request.user
     activity.expense = expense
-    activity.activity = "Edited Expense"
+    activity.activity = "Edited"
     activity.amount = amount
     activity.save()
 
