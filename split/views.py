@@ -379,7 +379,7 @@ def delete_expense(request):
     group = request.POST.get('group')
     g = Group.objects.get(id=group)
     expense = Expense.objects.get(id=expense_id)
-    if expense.expense_by==request.user.id:
+    if expense.expense_by == request.user.id:
         expense.is_deleted = True
         expense.save()
         activity = Activities()

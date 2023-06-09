@@ -1,11 +1,6 @@
 var app = angular.module('demo', ['ngSanitize', 'ui.select']);
 
-/**
- * AngularJS default filter with the following expression:
- * "person in people | filter: {name: $select.search, age: $select.search}"
- * performs an AND between 'name: $select.search' and 'age: $select.search'.
- * We want to perform an OR.
- */
+
 app.filter('propsFilter', function() {
   return function(items, props) {
     var out = [];

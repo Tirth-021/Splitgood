@@ -19,17 +19,6 @@ html {
   box-sizing: border-box;
 }
 
-/*body {*/
-/*  background-color: var(--color-background);*/
-/*  display: grid;*/
-/*  font-family: var(--font-family-base);*/
-/*  line-height: 1.5;*/
-/*  margin: 0;*/
-/*  min-block-size: 100vh;*/
-/*  padding: 5vmin;*/
-/*  place-items: center;*/
-/*}*/
-
 address {
   font-style: normal;
 }

@@ -1,13 +1,9 @@
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 from django.contrib.auth import logout, authenticate, login
 from django.views.decorators.cache import cache_control, never_cache
 
 
-# @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-# @never_cache
 def home(request):
     return render(request, "home.html")
 

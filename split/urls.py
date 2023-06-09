@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path
 
 from split.views import add_expense, split_expense, process_expense, edit_page, edit_expense

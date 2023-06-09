@@ -1,11 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import CASCADE
 
 from group.models import Group
 
-
-# Create your models here.
 
 class Expense(models.Model):
     expense_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expense_created_by')

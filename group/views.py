@@ -6,7 +6,7 @@ from activites.models import Activities
 from group.models import Group
 
 
-# Create your views here.
+
 
 def group_view(request):
     users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))

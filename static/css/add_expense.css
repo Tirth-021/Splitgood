@@ -5,11 +5,6 @@
   --blackColor: #1b2a39;
 }
 
-/*.add_expense{*/
-/*  margin-top: 500px;*/
-/*  margin-left: 500px;*/
-/*}*/
-
 body{
   background-color: var(--grayColor);
   font-family: Helvetica;

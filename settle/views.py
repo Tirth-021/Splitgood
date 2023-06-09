@@ -27,7 +27,9 @@ def settle_view(request):
     amount = []
     lender = []
     lender_id = []
-    expense = list(Expense.objects.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id', flat=True))
+    expense = list(
+        Expense.objects.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
+                                                                                                         flat=True))
     borrower = list(
         Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
             'lender').annotate(
@@ -44,9 +46,9 @@ def settle_view(request):
 
 
 def process_settle(request):
-    lender_id = request.GET.get('id')
-    amount = request.GET.get('amount')
-    group = request.GET.get('group')
+    lender_id = request.POST.get('id')
+    amount = request.POST.get('amount')
+    group = request.POST.get('group')
     context = {'lender_id': lender_id, 'amount': amount, 'group': group}
 
     return render(request, 'payments.html', context)
@@ -113,10 +115,8 @@ def process_payment(request):
 
 @csrf_exempt
 def paymenthandler(request):
-    # only accept POST request.
     if request.method == "POST":
 
-        # get the required parameters from post request.
         payment_id = request.POST.get('razorpay_payment_id', '')
         razorpay_order_id = request.POST.get('razorpay_order_id', '')
         signature = request.POST.get('razorpay_signature', '')
@@ -126,7 +126,6 @@ def paymenthandler(request):
             'razorpay_signature': signature
         }
 
-        # verify the payment signature.
         result = razorpay_client.utility.verify_payment_signature(
             params_dict)
         if result is not None:
