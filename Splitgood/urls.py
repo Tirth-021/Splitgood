@@ -29,6 +29,7 @@ urlpatterns = [
     path('group/', include('group.urls')),
     path('split/', include('split.urls')),
     path('settle/', include('settle.urls')),
-    path('activities/', include('activites.urls'))
+    path('activities/', include('activites.urls')),
+
 
 ]

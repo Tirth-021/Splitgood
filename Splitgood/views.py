@@ -1,7 +1,9 @@
+from io import BytesIO
+
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.contrib.auth import logout, authenticate, login
-from django.views.decorators.cache import cache_control, never_cache
+from group.models import Group
 
 
 def home(request):
@@ -22,7 +24,9 @@ def registration(request):
 
 
 def dashboard(request):
-    return render(request, "dashboard.html")
+    groups = Group.objects.filter(users=request.user.id)
+    context = {'groups': groups}
+    return render(request, "dashboard.html", context)
 
 
 def login_view(request):
@@ -31,11 +35,16 @@ def login_view(request):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         login(request, user)
-    return render(request, "dashboard.html")
+    groups = Group.objects.filter(users=request.user.id)
+    context = {'groups': groups}
+
+    return render(request, "dashboard.html", context)
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-@never_cache
 def logout_view(request):
     logout(request)
     return render(request, "home.html")
+
+
+
+

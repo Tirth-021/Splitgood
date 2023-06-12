@@ -6,8 +6,6 @@ from activites.models import Activities
 from group.models import Group
 
 
-
-
 def group_view(request):
     users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))
 
@@ -22,7 +20,6 @@ def create_group(request):
     users = []
     for i in users_lst:
         users.append(User.objects.filter(username=i))
-
 
     group = Group()
     group.created_by = request.user
@@ -40,6 +37,15 @@ def create_group(request):
     group.users.add(request.user)
     group.save()
 
-
-
     return render(request, 'dashboard.html')
+
+
+def show_group(request):
+    group_id = request.GET.get('id')
+    group = Group.objects.filter(id=group_id)[0]
+    activity = Activities.objects.filter(group=group).values("activity", "amount", "expense__expense_name",
+                                                             "group__group_name", "user__username", "date",
+                                                             "paid_to__lender__username",
+                                                             "added_id__username").order_by("-date")
+    context = {'activity': activity}
+    return render(request, 'group_view.html', context)
