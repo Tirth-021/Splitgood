@@ -1,9 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import CASCADE
 
-
-# Create your models here.
 
 class Group(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='custom_grp_created_by')

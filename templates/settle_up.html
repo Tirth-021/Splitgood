@@ -12,57 +12,76 @@
 </head>
 <body>
 {% block content %}
-<main class="main">
-    <header class="header">
-        <nav class="nav">
-            <span class="page-title text-lg">Transactions</span>
-        </nav>
-    </header>
-    <section class="data-summary">
-        <div class="data-info bg-yellow">
-            <h6 class="data-info__heading">Paid</h6>
-            <div class="data-info__content">
-                <sup class="sup">$</sup><span class="data-info__amount text-lg">1,253</span>
+    <main class="main">
+        <header class="header">
+            <nav class="nav">
+                <span class="page-title text-lg">Transactions</span>
+            </nav>
+        </header>
+        <section class="data-summary">
+            <div class="data-info bg-yellow">
+                <h6 class="data-info__heading">Paid</h6>
+                <div class="data-info__content">
+                    <sup class="sup">$</sup><span class="data-info__amount text-lg">1,253</span>
+                </div>
             </div>
-        </div>
-        <div class="data-info bg-blue">
-            <h6 class="data-info__heading">left</h6>
-            <div class="data-info__content">
-                <sup class="sup">$</sup><span class="data-info__amount text-lg">1,747</span>
+            <div class="data-info bg-blue">
+                <h6 class="data-info__heading">left</h6>
+                <div class="data-info__content">
+                    <sup class="sup">$</sup><span class="data-info__amount text-lg">1,747</span>
+                </div>
             </div>
-        </div>
 
-    </section>
-    {% if length == 0 %}
-    <h3 class="settled">You are all Settled up</h3>
+        </section>
+        {% if length == 0 %}
+            <h3 class="settled">You are all Settled up</h3>
 
-    {% else %}
-    <section class="data-body">
-        <div class="scroll-check">
-            <table id="data-table">
-                <thead>
-                <tr class="table__row--header">
-                    <th><span class="header__title">Name</span></th>
-                    <th><span class="header__title">Amount</span></th>
-                    <th></th>
-                </tr>
-                </thead>
+        {% else %}
+            <section class="data-body">
+                <div class="scroll-check">
+                    <table id="data-table">
+                        <thead>
+                        <tr class="table__row--header">
+                            <th><span class="header__title">Name</span></th>
+                            <th><span class="header__title">Amount</span></th>
+                            <th></th>
+                        </tr>
+                        </thead>
 
-                <tbody class="table__body">
-                {% for user, amount,id in borrow_list  %}
-                <tr class="table__row">
+                        <tbody class="table__body">
+                        {% for user, amount,id in borrow_list %}
+                            <tr class="table__row">
 
-                    <td><span class="id">{{ user }}</span></td>
-                    <td><span class="merchant">{{ amount }}</span></td>
-                    <td><a href="/settle/process_settle/?id={{ id }}&amount={{ amount }}&group={{ group }}"><button class="btn-primary">Settle up</button></a></td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </section>
-</main>
-{% endif %}
+                                <td><span class="id">{{ user }}</span></td>
+                                <td><span class="merchant">{{ amount }}</span></td>
+                                <td>
+                                    <button class="btn-primary" onclick="sendData('{{ id }}')">Settle up</button>
+                                </td>
+                                <td><form action="/settle/process_settle/" method="POST" style="visibility: hidden">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="amount" value="{{ amount }}">
+                                    <input type="hidden" name="id" value="{{ id }}">
+                                    <input type="hidden" name="group" value="{{ group }}">
+                                    <input type="submit" id="button_{{ id }}" style="visibility: hidden">
+                                </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            </main>
+        {% endif %}
+    <script>
+    function sendData(id) {
+        console.log("Function called")
+        document.getElementById("button_"+id).click();
+    }
+
+
+    </script>
+
 
 {% endblock %}
 </body>

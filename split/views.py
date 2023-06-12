@@ -3,10 +3,9 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.utils.dateparse import parse_datetime
 
+from activites.models import Activities
 from group.models import Group
 from split.models import Expense, Lender, Borrower
-
-
 
 
 def add_expense(request):
@@ -63,6 +62,14 @@ def process_expense(request):
     expense.created_at = date
     expense.group = g
     expense.save()
+
+    activity = Activities()
+    activity.group = g
+    activity.user = request.user
+    activity.expense = expense
+    activity.activity = "Added"
+    activity.amount = amount
+    activity.save()
 
     if split_type == 'split_equally':
 
@@ -121,7 +128,7 @@ def process_expense(request):
             borrower.expense_name = expense_name
             borrower.group = g
             borrower.save()
-            j = j+1
+            j = j + 1
         own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
         own_delete.delete()
 
@@ -143,7 +150,7 @@ def process_expense(request):
         lender.expense_name = expense_name
 
         lender.save()
-        j=0
+        j = 0
         for i in r_user:
             borrower = Borrower()
             borrower.expense = expense
@@ -153,7 +160,7 @@ def process_expense(request):
             borrower.expense_name = expense_name
             borrower.group = g
             borrower.save()
-            j = j+1
+            j = j + 1
         own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
         own_delete.delete()
 
@@ -165,7 +172,6 @@ def process_expense(request):
 
 def edit_page(request):
     expense_id = request.GET.get('expense')
-
 
     expense = Expense.objects.filter(id=expense_id)[0]
 
@@ -235,11 +241,18 @@ def edit_expense(request):
 
     expense = Expense.objects.get(id=expense_id)
 
-
     expense.expense_name = expense_name
     expense.amount = amount
     expense.created_at = date
     expense.save()
+
+    activity = Activities()
+    activity.group = g
+    activity.user = request.user
+    activity.expense = expense
+    activity.activity = "Edited"
+    activity.amount = amount
+    activity.save()
 
     if split_type == 'split_equally':
 
@@ -359,3 +372,22 @@ def edit_expense(request):
                    'expense': expense}
 
         return render(request, 'list_expenses.html', context)
+
+
+def delete_expense(request):
+    expense_id = request.POST.get('expense_id')
+    group = request.POST.get('group')
+    g = Group.objects.get(id=group)
+    expense = Expense.objects.get(id=expense_id)
+    if expense.expense_by == request.user.id:
+        expense.is_deleted = True
+        expense.save()
+        activity = Activities()
+        activity.group = g
+        activity.user = request.user
+        activity.expense = expense
+        activity.activity = "Deleted Expense"
+        activity.save()
+        return render(request, 'list_expenses.html')
+    else:
+        return render(request, 'error.html')

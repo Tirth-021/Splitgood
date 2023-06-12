@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import CASCADE
 
 from group.models import Group
 
 
-# Create your models here.
+class LiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
 
 class Expense(models.Model):
     expense_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expense_created_by')
@@ -16,6 +18,9 @@ class Expense(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)
+
+    objects = models.Manager()  # default manager
+    live_expense = LiveManager()  # for expense not deleted
 
     class Meta:
         db_table = 'expense'

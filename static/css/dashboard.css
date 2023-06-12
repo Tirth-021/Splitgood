@@ -12,7 +12,47 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     height: 100vh;
 }
+/* -------------- MESSAGES -------------- */
+ul.messages {
+    margin:10px 100px;
+    padding:0;
+    list-style-type:
+    none;
+}
+ul.messages li.alert-success,
+ul.messages li.alert-warning,
+ul.messages li.alert-error,
+ul.messages li.alert-info {
+    margin:0;
+    padding:14px 20px;
+    list-style:none;
+    color:#fff;
+}
 
+ul.messages li.alert-success { background:#81CE92; }
+ul.messages li.alert-success a { color:#0ac33e; }
+
+ul.messages li.alert-error { background:#a30029; color:#e9828e; }
+ul.messages li.alert-error a { color:#e9828e; }
+
+ul.messages li.alert-info { background:#faffae; color:#696b4e; }
+ul.messages li.alert-info a { color:#1586de; }
+
+ul.messages li.alert-warning { background:#de9404; }
+ul.messages li.alert-warning a { color:#f49000; }
+
+ul.messages li a.close {
+    margin:0;
+    float:right;
+    opacity:1;
+    border:0;
+    box-shadow:none;
+    text-shadow:none;
+}
+
+/*.login-form {*/
+/*    float:left;*/
+/*}*/
 /* -------------- CONTAINER -------------- */
 .container {
     display: flex;

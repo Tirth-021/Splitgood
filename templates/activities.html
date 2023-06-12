@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+    {% block style %}
+        {% load customtags %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/activity.css' %}">
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+    <br>
+    <div class="container">
+        <div class="section">
+            <div class="blog-post blog-single-post">
+                <div class="single-post-title">
+                    <h1>Activities</h1>
+                </div>
+                <div class="single-post-content">
+                    <table class="events-list">
+                        {% for i in activity %}
+                            <tr id="data">
+                                 {% if i.activity == "Paid" and i.user__username|check_user:request.user.username == "You"  %}
+                                <td>
+                                    <div class="event-date">
+                                        <div class="event-day" id="date">
+                                            {{ i.date|give_date }}
+                                        </div>
+                                        <div class="event-month" id="month">
+                                            {{ i.date|give_month }}
+                                        </div>
+                                    </div>
+                                    <div class="event-date">
+                                         <div class="event-month">
+                                            {{ i.date|give_time }}
+                                        </div>
+                                    </div>
+                                </td>
+                                 {% elif i.activity != "Paid" %}
+                                <td>
+                                    <div class="event-date">
+                                        <div class="event-day" id="date">
+                                            {{ i.date|give_date }}
+                                        </div>
+                                        <div class="event-month" id="month">
+                                            {{ i.date|give_month }}
+                                        </div>
+                                    </div>
+                                    <div class="event-date" id="time">
+                                         <div class="event-month">
+                                            {{ i.date|give_time }}
+                                        </div>
+                                    </div>
+                                </td>
+                                {% endif %}
+
+                                {% if i.activity == "Paid" and i.user__username|check_user:request.user.username == "You"  %}
+                                <td>
+                                    <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;{{ i.activity }}&nbsp;&nbsp;&nbsp;&nbsp; {{ i.paid_to__lender__username }}&nbsp;&nbsp;&nbsp;&nbsp; with &nbsp;&nbsp;&nbsp;&nbsp;amount  &nbsp;&nbsp;&nbsp;&nbsp;{{ i.amount }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                    in &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
+                                </td>
+                                {% elif i.activity == "Added" or i.activity == "Edited" %}
+                                <td>
+                                    <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;{{ i.activity }}&nbsp;&nbsp;&nbsp;&nbsp; expense  &nbsp;&nbsp;&nbsp;&nbsp;{{ i.expense__expense_name }}&nbsp;&nbsp;&nbsp;&nbsp; with &nbsp;&nbsp;&nbsp;&nbsp;amount  &nbsp;&nbsp;&nbsp;&nbsp;{{ i.amount }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                    in &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
+                                </td>
+                                  {% elif i.activity == "Added User" %}
+                                <td>
+                                    <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;Added &nbsp;&nbsp;&nbsp;&nbsp;{{ i.added_id__username|check_user:request.user.username }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                    to &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+</body>
+</html>

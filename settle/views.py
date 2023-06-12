@@ -1,10 +1,12 @@
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
 from django.shortcuts import render
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 
+from activites.models import Activities
 from group.models import Group
 from django.shortcuts import render
 
@@ -25,7 +27,9 @@ def settle_view(request):
     amount = []
     lender = []
     lender_id = []
-    expense = list(Expense.objects.filter(Q(group=group) & Q(users=request.user)).values_list('id', flat=True))
+    expense = list(
+        Expense.live_expense.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
+                                                                                                         flat=True))
     borrower = list(
         Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
             'lender').annotate(
@@ -42,9 +46,9 @@ def settle_view(request):
 
 
 def process_settle(request):
-    lender_id = request.GET.get('id')
-    amount = request.GET.get('amount')
-    group = request.GET.get('group')
+    lender_id = request.POST.get('id')
+    amount = request.POST.get('amount')
+    group = request.POST.get('group')
     context = {'lender_id': lender_id, 'amount': amount, 'group': group}
 
     return render(request, 'payments.html', context)
@@ -79,25 +83,40 @@ def process_payment(request):
         for i in borrow_transaction:
             i.is_paid = True
             i.save()
+        activity = Activities()
+        activity.activity = "Paid"
+        activity.amount = int(amount)
+        g = Group.objects.get(group=group)
+        activity.group = g
+        activity.user = request.user
+        activity.save()
 
         return render(request, 'payment_online.html', context=context)
     else:
         lender_id = request.POST.get('lender_id')
         group = request.POST.get('group')
+        amount = request.POST.get('amount')
         borrow_transaction = Borrower.objects.filter(
             Q(borrowers=request.user.id) & Q(lender=lender_id) & Q(is_paid=False) & Q(group=group))
         for i in borrow_transaction:
             i.is_paid = True
             i.save()
+        activity = Activities()
+        activity.activity = "Paid"
+        activity.amount = int(amount)
+        g = Group.objects.get(id=group)
+        activity.group = g
+        activity.user = request.user
+        activity.paid_to = Lender.objects.filter(id=lender_id)[0]
+        activity.save()
+        messages.success(request, "You are settled up.")
         return render(request, 'dashboard.html')
 
 
 @csrf_exempt
 def paymenthandler(request):
-    # only accept POST request.
     if request.method == "POST":
 
-        # get the required parameters from post request.
         payment_id = request.POST.get('razorpay_payment_id', '')
         razorpay_order_id = request.POST.get('razorpay_order_id', '')
         signature = request.POST.get('razorpay_signature', '')
@@ -107,18 +126,10 @@ def paymenthandler(request):
             'razorpay_signature': signature
         }
 
-        # verify the payment signature.
         result = razorpay_client.utility.verify_payment_signature(
             params_dict)
         if result is not None:
-            # amount =   # Rs. 200
-            # amount =
-
-            # capture the payemt
-            # razorpay_client.payment.capture(payment_id)
-
-            # render success page on successful caputre of payment
-
+            messages.success(request, "You are settled up.")
             return render(request, 'dashboard.html')
         else:
 
