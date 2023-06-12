@@ -28,7 +28,7 @@ def settle_view(request):
     lender = []
     lender_id = []
     expense = list(
-        Expense.objects.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
+        Expense.live_expense.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
                                                                                                          flat=True))
     borrower = list(
         Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(

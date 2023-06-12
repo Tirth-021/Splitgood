@@ -33,6 +33,11 @@
                                             {{ i.date|give_month }}
                                         </div>
                                     </div>
+                                    <div class="event-date">
+                                         <div class="event-month">
+                                            {{ i.date|give_time }}
+                                        </div>
+                                    </div>
                                 </td>
                                  {% elif i.activity != "Paid" %}
                                 <td>
@@ -42,6 +47,11 @@
                                         </div>
                                         <div class="event-month" id="month">
                                             {{ i.date|give_month }}
+                                        </div>
+                                    </div>
+                                    <div class="event-date" id="time">
+                                         <div class="event-month">
+                                            {{ i.date|give_time }}
                                         </div>
                                     </div>
                                 </td>
@@ -71,7 +81,6 @@
             </div>
         </div>
     </div>
-
 
 {% endblock %}
 

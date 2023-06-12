@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "group",
     "split",
-    "activites"
+    "activites",
+    "settle",
 ]
 
 MIDDLEWARE = [
