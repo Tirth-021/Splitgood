@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
+import environ
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-csn9)l_x9g&14lw-$113&33-=y05!3060+-i-sd@wke5#7mozw"
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     "split",
     "activites",
     "settle",
+
 ]
 
 MIDDLEWARE = [
@@ -73,16 +77,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Splitgood.wsgi.application"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Splitgood',
-        'USER': 'tirth',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost'
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
     }
 }
 
@@ -106,9 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-RAZOR_KEY_ID = 'rzp_test_1uITbiqTyyvX1P'
+RAZOR_KEY_ID = env("RAZOR_KEY_ID")
 
-RAZOR_KEY_SECRET = 'wHznDjoe3Eyg4iWUizuNMahA'
+RAZOR_KEY_SECRET = env("RAZOR_KEY_SECRET")
 
 LANGUAGE_CODE = "en-us"
 

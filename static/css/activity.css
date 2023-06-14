@@ -1,60 +1,180 @@
-h1{
+h1 {
     margin-left: 40%;
     margin-top: 5%;
     margin-bottom: 7%;
 }
-b{
-  font-weight: bolder;
-  font-size:18px;
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
-#data{
-  padding:2%;
-  margin:2%;
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
 }
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+#top-info {
+    display: flex;
+}
+
+svg {
+
+    height: 25px;
+    width: 20px;
+
+}
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    margin-left: 90%;
+}
+
+.nav-bar h2 {
+    text-transform: uppercase;
+    margin-left: 1.5rem;
+    flex: 1 1 25%;
+}
+
+.nav-bar ul {
+    flex: 75% 1 1;
+    list-style-type: none;
+    display: flex;
+    justify-content: end;
+    gap: 3px;
+}
+
+.nav-bar ul li {
+    flex: 0 1 90px;
+    background: #7C5CfC;
+    text-align: center;
+    transition: 250ms ease;
+}
+
+.nav-bar a {
+    text-decoration: none;
+    width: 155px;
+    color: initial;
+    border: 1px solid white;
+    display: block;
+    height: 100%;
+    padding: .6rem 0;
+    text-transform: capitalize;
+    color: white;
+}
+
+.nav-bar li:hover {
+    background: #404089;
+}
+
+@media screen and (max-width: 480px) {
+    .nav-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .nav-bar ul {
+        flex-direction: column;
+    }
+
+    .nav-bar h2 {
+        margin: 0;
+        text-align: center;
+    }
+
+    .nav-bar li {
+        flex-basis: 100%;
+    }
+}
+
+
+b {
+    font-weight: bolder;
+    font-size: 18px;
+}
+
+#data {
+    padding: 2%;
+    margin: 2%;
+}
+
 .events-list {
-  width: 100%;
-  font-size: 0.9em;
+    width: 100%;
+    font-size: 0.9em;
 }
 
 .events-list tr td {
-  padding: 5px 20px 5px 0;
+    padding: 5px 20px 5px 0;
 }
 
 .events-list tr td:last-child {
-  padding: 5px 0;
-  text-align: right;
+    padding: 5px 0;
+    text-align: right;
 }
 
 .events-list tr:hover .event-date {
-  border-left: 5px solid #404089;
+    border-left: 5px solid #404089;
 }
 
 .events-list .event-date {
-  margin: 3px 0;
-  padding: 2px 10px;
-  border-left: 5px solid #CFCFCF;
-  -webkit-transition: all .25s linear;
-  -moz-transition: all .25s linear;
-  -o-transition: all .25s linear;
-  -ms-transition: all .25s linear;
-  transition: all .25s linear;
+    margin: 3px 0;
+    padding: 2px 10px;
+    border-left: 5px solid #CFCFCF;
+    -webkit-transition: all .25s linear;
+    -moz-transition: all .25s linear;
+    -o-transition: all .25s linear;
+    -ms-transition: all .25s linear;
+    transition: all .25s linear;
 }
 
 .events-list .event-date .event-day {
-  color: #004A5B;
-  font-size: 1.2em;
-  font-weight: 600;
-  text-align: left;
+    color: #004A5B;
+    font-size: 1.2em;
+    font-weight: 600;
+    text-align: left;
 }
 
 .events-list .event-date .event-month {
-  color: #777;
-  font-size: 1em;
-  font-weight: 600;
-  text-align: left;
+    color: #777;
+    font-size: 1em;
+    font-weight: 600;
+    text-align: left;
 }
 
 .events-list .event-date .event-venue,
 .events-list .event-date .event-price {
-  white-space: nowrap;
+    white-space: nowrap;
 }

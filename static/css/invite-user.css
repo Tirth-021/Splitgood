@@ -1,0 +1,60 @@
+
+.container_invite {
+    background-color: white;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    padding: 15px 30px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    /*   position: absolute;  */
+    width: 600px;
+    top: calc(50% - 300px);
+    left: calc(50% - 300px);
+    margin-left: 100px;
+}
+
+
+#emailHelp {
+    font-style: italic;
+
+}
+
+#submit{
+    margin-left: 100px;
+}
+
+.selectfield {!important;
+
+background: rgba(255, 255, 255, 0.1);
+
+border: none;
+
+font-size: 16px;
+
+height: auto;
+
+margin: 0;
+
+outline: 0;
+
+padding: 15px;
+
+width: 100%;
+
+background-color: #f8f8f8;
+
+color: #8a97a0;
+
+box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset;
+
+}
+
+.btn-primary {
+    background-color: #7C5CfC;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #434343;
+    color: white;
+}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+    {% block style %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/invite-user.css' %}">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    {% endblock %}
+</head>
+
+{% block content %}
+    <div class="container_invite">
+        <h4>Invite New Members to Split-good</h4>
+        <form class="simple_form new_user" id="new_user" action="/group/send_invite/" method="post">
+            {% csrf_token %}
+            <div class="form-group email optional user_email">
+                <label class="form-control-label email optional" for="user_email">Email/User</label>
+                <select id="people" class="js-example-basic-multiple selectfield" name="users_email"
+                        multiple="multiple">
+                    {% for user in users %}
+                        <option value="{{ user }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                <small id="emailHelp" class="form-text text-muted">*To invite multiple team members, please enter a
+                    comma-separated list of emails, and put each email on a separate line.</small>
+                <input type="hidden" value="{{ uuid }}" name="uuid">
+                <input type="hidden" value="{{ group_id }}" name="group_id">
+                <div class="actions">
+                    <input type="submit" name="commit" id="submit" class="btn btn-primary" value="Send invitation">
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.js-example-basic-multiple').select2(
+                {
+                    tags: true,
+                    tokenSeparators: [',', ' ']
+                }
+            );
+        });
+    </script>
+{% endblock %}

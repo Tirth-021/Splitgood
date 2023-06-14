@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/invite-register.css' %}">
+       <link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}"/>
+
+</head>
+<body>
+<div>
+<div class="flex_container blank_page clearfix">
+  <a href="#"><img height="200" width="200" class="envelope" src="{% static 'favicon.png' %}"></a>
+
+  <div class="content-block">
+      <h2>Join “{{ group_name }}”</h2>
+
+    <form class="form-stacked" id="new_user" action="/invited-register/" accept-charset="UTF-8" method="post">
+        {% csrf_token %}
+      <div id="username" style="font-size: 24px; line-height: 140%; margin: 30px 0 5px 10%">
+        Hi there! My name is
+      </div>
+      <input tabindex="1" autocomplete="off" style="font-size: 32px; height: 42px;" onchange="showSecondaryFields()" onkeyup="showSecondaryFields()" type="text" value="" name="username" id="user_name">
+        <input type="hidden" name="uuid" value="{{ uuid }}">
+      <div class="secondary_fields" style="display: none;">
+        <div style="margin: 30px 0 5px 10%;">
+          Here’s my <strong>email address</strong>:
+          <br>
+        </div>
+        <input tabindex="2" type="email" name="email" id="user_email">
+
+        <div id="password" style="margin: 30px 0 5px 10%;">
+          And here’s my <strong>password</strong>:
+          <br>
+        </div>
+         <input tabindex="3" type="password" name="password" id="user_password">
+      </div>
+
+
+      <div style="position: relative;margin: 30px 0 5px 10%;">
+        <input type="submit" name="commit" value="Sign me up!" class="btn btn-large btn-orange" autocomplete="off" onclick="$(this).attr('value', 'Just a sec...').attr('disabled','disabled'); this.form.submit();" style="padding: 11px 15px" data-disable-with="Sign me up!">
+      </div>
+    </form>
+</div>
+
+
+</div>
+</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    function showSecondaryFields(){
+      $('.secondary_fields').slideDown();
+    }
+    function showEmailForm(){
+      $('#signup_options').fadeOut(250).next().delay(250).fadeIn(250);
+      setTimeout("$('#user_name').focus()", 300);
+      return false;
+    }
+  </script>
+</body>
+</html>
