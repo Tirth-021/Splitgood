@@ -85,7 +85,7 @@ def send_invite(request):
 
 
 def send_email(email, uuid, group_name):
-    uri = f"http://127.0.0.1:8000/signup/{uuid}"
+    uri = f"http://127.0.0.1:8000/invited-register/{uuid}"
     connection = mail.get_connection()
     subject = "Welcome to Split-good "
     message = "We are glad to have you here! \n" \
