@@ -1,0 +1,108 @@
+
+#fat_rabbit .flex_container.blank_page {
+    line-height: 36px;
+    font-size: 18px;
+    width: auto;
+    max-width: 600px;
+    margin-top: 50px;
+    padding-bottom: 50px;
+}
+
+#fat_rabbit .flex_container.blank_page .content-block {
+    float: left;
+    max-width: 360px;
+    padding-left: 15px;
+}
+
+
+#fat_rabbit .flex_container.blank_page {
+    line-height: 36px;
+    font-size: 18px;
+    width: auto;
+    max-width: 600px;
+    margin-top: 50px;
+    padding-bottom: 50px;
+}
+
+#fat_rabbit .flex_container {
+    width: 940px;
+    padding: 0 10px;
+    margin: 0 auto;
+    position: relative;
+}
+
+div {
+    display: block;
+}
+
+body {
+    padding-top: 33px;
+    text-rendering: optimizeLegibility;
+    font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+
+body {
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333333;
+    background-color: #ffffff;
+}
+
+img{
+    margin-left: 10%;
+}
+h2{
+    margin-left: 10%;
+}
+#username{
+    margin-left: 10%;
+}
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="datetime"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+input[type="url"],
+select,
+textarea {
+    background: rgba(255, 255, 255, 0.1);
+
+    border: none;
+
+    font-size: 16px;
+
+    height: auto;
+
+    margin: 0;
+
+    outline: 0;
+
+    padding: 15px;
+
+    width: 60%;
+
+    margin-left: 10%;
+
+    background-color: #f8f8f8;
+
+    color: #404089;
+
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03) inset;
+
+    margin-bottom: 30px;
+
+}
+
+
+input[type="radio"],
+input[type="checkbox"] {
+
+    margin: 0px 21px 28px 0px;
+
+}

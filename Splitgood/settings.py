@@ -74,6 +74,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "Splitgood.wsgi.application"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_USE_TLS = True
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "tirthbhatt02@gmail.com"
+EMAIL_HOST_PASSWORD = "arqynxjfirxbnxit"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 

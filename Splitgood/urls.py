@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import home, registration, login_view, logout_view, dashboard
+from .views import home, registration, login_view, logout_view, dashboard, invited_register, add_registered
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,6 +26,8 @@ urlpatterns = [
     path("registration/", registration),
     path("login/", login_view),
     path("logout/", logout_view),
+    path("signup/<uuid:uuid>", invited_register),
+    path("add_registered",add_registered),
     path('group/', include('group.urls')),
     path('split/', include('split.urls')),
     path('settle/', include('settle.urls')),
