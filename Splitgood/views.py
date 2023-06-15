@@ -1,11 +1,13 @@
 from io import BytesIO
 
 from django.contrib.auth.models import User
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import logout, authenticate, login
 from django.views import View
+from django.views.decorators.csrf import csrf_protect
 
 from group.models import Group
+from userprofile.models import Profile
 
 
 def home(request):
@@ -21,13 +23,17 @@ def registration(request):
         user.set_password(password)
         user.email = email
         user.save()
+        profile = Profile()
+        profile.user = user
+        profile.save()
 
     return render(request, "home.html")
 
 
 def dashboard(request):
     groups = Group.objects.filter(users=request.user.id)
-    context = {'groups': groups}
+    profile = Profile.objects.filter(user=request.user)[0]
+    context = {'groups': groups,'profile': profile}
     return render(request, "dashboard.html", context)
 
 
@@ -36,9 +42,12 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        if user is None:
+            return redirect('registration')
         login(request, user)
     groups = Group.objects.filter(users=request.user.id)
-    context = {'groups': groups}
+    profile = Profile.objects.filter(user=request.user)[0]
+    context = {'groups': groups, 'profile': profile}
 
     return render(request, "dashboard.html", context)
 

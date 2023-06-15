@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Splitgood</title>
+    {% block style %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/userprofile.css' %}">
+    {% endblock %}
+</head>
+<body>
+{% block content %}
+    <h1>User Profile</h1>
+    <div class="settings-message" id="js-message">{% if message != '' %}
+        <script>
+            const messageElement = document.querySelector('#js-message');
+            messageElement.innerText = 'Wrong Password!';
+            messageElement.classList.add('settings-message--error');
+            messageElement.classList.remove('settings-message--success');
+        </script>
+    {% endif %}
+    </div>
+    <form method="post" action="/user/updateuser/" id="userform" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input id="js-file-uploader" class="hidden" name="profile-picture" type="file" accept="image/png, image/jpeg"/>
+
+        <div id="js-profile-pic" class="profile-pic__container">
+            {% if not profile.avatar %}
+                <img class="user__image"
+                     id="oldimage" src="https://avatar.oxro.io/avatar.svg?name={{ user.username }}&color=000&rounded=8&caps=1"/>
+            {% else %}
+                <img class="user__image" id="oldimage" src="{{ profile.avatar.url }}" alt="profile"/>
+            {% endif %}
+            <div id="js-profile-trigger" class="profile-pic__foreground">Upload Profile Pic</div>
+        </div>
+        <div id="remove">
+            <label for="Remove Photo"> </label>
+            <input name="rmphoto" type="checkbox" value="true">
+            Remove Photo
+        </div>
+
+        <div class="input__container">
+            <div class="input-container__single">
+                <label for="name">First Name:</label>
+                <input type="text" name="first-name" id="fname" value="{{ first_name }}"/>
+            </div>
+            <div class="input-container__single">
+                <label for="name">Last Name:</label>
+                <input type="text" name="last-name" id="lname" value="{{ last_name }}"/>
+            </div>
+            <div class="input-container__single">
+                <label for="email">Email:</label>
+                <input type="email" name="email" id="email" value="{{ email }}"/>
+            </div>
+            <div class="input-container__single">
+                <label for="mobile">Mobile Number:</label>
+                <input type="text" name="mobile" id="mobile" value="{{ profile.mobile_number }}"/>
+            </div>
+            <div class="input-container__single">
+                <label for="js-password">Old Password:</label>
+                <input type="password" id="js-password" name="old-password" placeholder="*****"/>
+                <span id="js-toggle-password" class="input-action">Display Password</span>
+            </div>
+            <div class="input-container__single">
+                <label for="js-password-new">New Password:</label>
+                <input type="password" id="js-password-new" name="new-password" placeholder="*****"/>
+                <span id="js-toggle-password-new" class="input-action">Display Password</span>
+            </div>
+            <div class="input-container__single">
+                <label for="js-password-confirm">Confirm Password:</label>
+                <input type="password" id="js-password-confirm" name="confirm-password" placeholder="*****"/>
+                <span class="input-action" id="js-suggest-password">Suggest Password</span>
+            </div>
+        </div>
+        <input type="submit" value="Save Profile" id="submitbtn"/>
+
+
+    </form>
+
+    </body>
+    <script src="{% static 'js/userprofile.js' %}"></script>
+{% endblock %}
+</html>

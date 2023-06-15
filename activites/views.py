@@ -1,9 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from activites.models import Activities
 from group.models import Group
 
 
+@login_required(login_url='login/')
 def show_activity(request):
     groups = Group.objects.filter(users=request.user)
     activity = Activities.objects.filter(group__in=groups).values("activity", "amount", "expense__expense_name",

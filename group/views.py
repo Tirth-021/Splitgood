@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import mail
 from django.db.models import Q
@@ -9,6 +10,7 @@ from activites.models import Activities
 from group.models import Group
 
 
+@login_required(login_url='login/')
 def group_view(request):
     users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))
 
@@ -16,6 +18,7 @@ def group_view(request):
     return render(request, 'add_group.html', context={'users': users})
 
 
+@login_required(login_url='login/')
 def create_group(request):
     group_name = request.POST.get('group_name')
     description = request.POST.get('group_desc')
@@ -43,6 +46,7 @@ def create_group(request):
     return render(request, 'dashboard.html')
 
 
+@login_required(login_url='login/')
 def show_group(request):
     group_id = request.GET.get('id')
     group = Group.objects.filter(id=group_id)[0]
@@ -54,6 +58,7 @@ def show_group(request):
     return render(request, 'group_view.html', context)
 
 
+@login_required(login_url='login/')
 def invite_users(request):
     group_id = request.GET.get('group_id')
     group = Group.objects.filter(id=group_id)[0]
@@ -66,6 +71,7 @@ def invite_users(request):
     return render(request, 'invite-users.html', context)
 
 
+@login_required(login_url='login/')
 def send_invite(request):
     uuid = request.POST.get('uuid')
     names = request.POST.getlist('users_email')
@@ -99,4 +105,3 @@ def send_email(email, uuid, group_name):
         connection=connection,
     )
     email.send()
-

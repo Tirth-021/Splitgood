@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render
@@ -7,13 +8,13 @@ from activites.models import Activities
 from group.models import Group
 from split.models import Expense, Lender, Borrower
 
-
+@login_required(login_url='login/')
 def add_expense(request):
     group_info = Group.objects.filter(users=request.user)
 
     return render(request, 'add_group_expense.html', context={'group_info': group_info})
 
-
+@login_required(login_url='login/')
 def split_expense(request):
     group_id = request.GET.get('group_id')
     group = Group.objects.filter(id=group_id)
@@ -21,7 +22,7 @@ def split_expense(request):
     return render(request, 'add_expense.html',
                   context={'group_id': group_id, 'group': group[0], 'users': group[0].users.all(), 'ids': ids})
 
-
+@login_required(login_url='login/')
 def process_expense(request):
     split_type = request.POST.get('split_type')
     expense_name = request.POST.get('expense_name')
@@ -169,7 +170,7 @@ def process_expense(request):
 
         return render(request, 'list_expenses.html', context)
 
-
+@login_required(login_url='login/')
 def edit_page(request):
     expense_id = request.GET.get('expense')
 
@@ -188,7 +189,7 @@ def edit_page(request):
                'group_id': group_id, 'date': date, 'expense_id': expense_id}
     return render(request, 'edit_expense.html', context)
 
-
+@login_required(login_url='login/')
 def edit_expense(request):
     split_type = request.POST.get('split_type')
     expense_id = request.POST.get('expense_id')
@@ -373,7 +374,7 @@ def edit_expense(request):
 
         return render(request, 'list_expenses.html', context)
 
-
+@login_required(login_url='login/')
 def delete_expense(request):
     expense_id = request.POST.get('expense_id')
     group = request.POST.get('group')
