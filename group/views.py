@@ -65,7 +65,7 @@ def invite_users(request):
     group_id = group.id
     group_name = group.group_name
     g_users = list(group.users.all().values_list('id', flat=True))
-    left_users = User.objects.exclude(id__in=g_users)
+    left_users = User.objects.exclude(Q(id__in=g_users) | Q(is_superuser=True))
     uuid = group.uuid
     context = {'group_id': group_id, 'name': group_name, 'uuid': uuid, 'users': left_users}
     return render(request, 'invite-users.html', context)
