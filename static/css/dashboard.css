@@ -17,6 +17,53 @@ img{
     height:50px;
     width:50px;
 }
+/* -------------- PAGINATOR -------------- */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.pagination a,
+.pagination span {
+  color: #333;
+  text-decoration: none;
+  padding: 8px 12px;
+  margin: 0 4px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.pagination a:hover {
+  background-color: #ddd;
+}
+
+.pagination .current-page {
+  color: #7C5CfC;
+  background-color: #333;
+  font-weight: bold;
+}
+
+.pagination .ellipsis {
+  margin: 0 4px;
+}
+
+.pagination .disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+@media (max-width: 480px) {
+  .pagination a,
+  .pagination span {
+    padding: 6px 10px;
+    margin: 0 2px;
+  }
+}
+
 
 /* -------------- CARDS -------------- */
 

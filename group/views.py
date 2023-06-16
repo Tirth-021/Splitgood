@@ -1,49 +1,48 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core import mail
 from django.db.models import Q
 from django.shortcuts import render
-from django.core.mail import send_mail
+from django.views import View
 
 from Splitgood import settings
 from activites.models import Activities
 from group.models import Group
 
 
-@login_required(login_url='login/')
-def group_view(request):
-    users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))
+class CreateGroupView(LoginRequiredMixin, View):
+    login_url = 'login/'
 
-    data = {'users': users}
-    return render(request, 'add_group.html', context={'users': users})
+    def get(self, request):
+        users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))
+        return render(request, 'add_group.html', context={'users': users})
 
+    def post(self, request):
+        group_name = request.POST.get('group_name')
+        description = request.POST.get('group_desc')
+        users_lst = request.POST.getlist('users')
+        users = []
+        for i in users_lst:
+            users.append(User.objects.filter(username=i))
 
-@login_required(login_url='login/')
-def create_group(request):
-    group_name = request.POST.get('group_name')
-    description = request.POST.get('group_desc')
-    users_lst = request.POST.getlist('users')
-    users = []
-    for i in users_lst:
-        users.append(User.objects.filter(username=i))
+        group = Group()
+        group.created_by = request.user
+        group.group_name = group_name
+        group.group_description = description
+        group.save()
+        for user in users:
+            group.users.add(user[0])
+            activity = Activities()
+            activity.activity = "Added User"
+            activity.group_id = group.id
+            activity.user_id = request.user.id
+            activity.added = user[0]
+            activity.save()
+        group.users.add(request.user)
+        group.save()
 
-    group = Group()
-    group.created_by = request.user
-    group.group_name = group_name
-    group.group_description = description
-    group.save()
-    for user in users:
-        group.users.add(user[0])
-        activity = Activities()
-        activity.activity = "Added User"
-        activity.group_id = group.id
-        activity.user_id = request.user.id
-        activity.added = user[0]
-        activity.save()
-    group.users.add(request.user)
-    group.save()
-
-    return render(request, 'dashboard.html')
+        return render(request, 'dashboard.html')
 
 
 @login_required(login_url='login/')
@@ -58,36 +57,38 @@ def show_group(request):
     return render(request, 'group_view.html', context)
 
 
-@login_required(login_url='login/')
-def invite_users(request):
-    group_id = request.GET.get('group_id')
-    group = Group.objects.filter(id=group_id)[0]
-    group_id = group.id
-    group_name = group.group_name
-    g_users = list(group.users.all().values_list('id', flat=True))
-    left_users = User.objects.exclude(Q(id__in=g_users) | Q(is_superuser=True))
-    uuid = group.uuid
-    context = {'group_id': group_id, 'name': group_name, 'uuid': uuid, 'users': left_users}
-    return render(request, 'invite-users.html', context)
+class InviteUsersView(LoginRequiredMixin, View):
+    template_name = 'invite-users.html'
 
+    def get(self, request):
+        group_id = request.GET.get('group_id')
+        group = Group.objects.filter(id=group_id).first()
+        group_id = group.id
+        group_name = group.group_name
+        g_users = list(group.users.all().values_list('id', flat=True))
+        left_users = User.objects.exclude(Q(id__in=g_users) | Q(is_superuser=True))
+        uuid = group.uuid
+        context = {'group_id': group_id, 'name': group_name, 'uuid': uuid, 'users': left_users}
+        return render(request, self.template_name, context)
 
-@login_required(login_url='login/')
-def send_invite(request):
-    uuid = request.POST.get('uuid')
-    names = request.POST.getlist('users_email')
-    group_id = request.POST.get('group_id')
-    group = Group.objects.filter(id=group_id)[0]
-    group_name = group.group_name
-    users = list(User.objects.all().values_list("username"))
-    for i in names:
-        if i in users:
-            user = User.objects.filter(username=i)
-            group.users.add(user[0])
-        else:
-            send_email(i, uuid, group_name)
-    groups = Group.objects.filter(users=request.user.id)
-    context = {'groups': groups}
-    return render(request, 'dashboard.html', context)
+    def post(self, request):
+        uuid = request.POST.get('uuid')
+        names = request.POST.getlist('users_email')
+        group_id = request.POST.get('group_id')
+        group = Group.objects.filter(id=group_id).first()
+        group_name = group.group_name
+        users = list(User.objects.all().values_list("username"))
+
+        for i in names:
+            if i in users:
+                user = User.objects.filter(username=i).first()
+                group.users.add(user)
+            else:
+                send_email(i, uuid, group_name)
+
+        groups = Group.objects.filter(users=request.user.id)
+        context = {'groups': groups}
+        return render(request, 'dashboard.html', context)
 
 
 def send_email(email, uuid, group_name):

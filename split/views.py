@@ -1,174 +1,175 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render
 from django.utils.dateparse import parse_datetime
+from django.views import View
 
 from activites.models import Activities
 from group.models import Group
 from split.models import Expense, Lender, Borrower
 
-@login_required(login_url='login/')
+
+@login_required()
 def add_expense(request):
     group_info = Group.objects.filter(users=request.user)
 
     return render(request, 'add_group_expense.html', context={'group_info': group_info})
 
-@login_required(login_url='login/')
-def split_expense(request):
-    group_id = request.GET.get('group_id')
-    group = Group.objects.filter(id=group_id)
-    ids = group[0].users.all().values('id')
-    return render(request, 'add_expense.html',
-                  context={'group_id': group_id, 'group': group[0], 'users': group[0].users.all(), 'ids': ids})
 
-@login_required(login_url='login/')
-def process_expense(request):
-    split_type = request.POST.get('split_type')
-    expense_name = request.POST.get('expense_name')
-    amount = request.POST.get('amount')
-    group = request.POST.get('group_id')
-    users_lst = request.POST.getlist('users_selected')
-    uneuser = request.POST.getlist('une_users_selected')
-    date = parse_datetime(request.POST.get('date'))
-    g = Group.objects.filter(id=group)[0]
-    r_user = request.POST.getlist('r_users_selected')
+class ExpenseView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    template_name = 'add_expense.html'
 
-    member_list = []
-    if len(r_user) > 0:
-        for i in r_user:
-            us = User.objects.get(username=i)
+    def get(self, request):
+        group_id = request.GET.get('group_id')
+        group = Group.objects.filter(id=group_id)
+        ids = group[0].users.all().values('id')
+        return render(request, self.template_name,
+                      context={'group_id': group_id, 'group': group[0], 'users': group[0].users.all(), 'ids': ids})
 
-            member_list.append(us.id)
-    if len(uneuser) > 0:
-        for i in uneuser:
-            us = User.objects.get(username=i)
+    def post(self, request):
+        split_type = request.POST.get('split_type')
+        expense_name = request.POST.get('expense_name')
+        amount = request.POST.get('amount')
+        group = request.POST.get('group_id')
+        users_lst = request.POST.getlist('users_selected')
+        uneuser = request.POST.getlist('une_users_selected')
+        date = parse_datetime(request.POST.get('date'))
+        g = Group.objects.filter(id=group)[0]
+        r_user = request.POST.getlist('r_users_selected')
 
-            member_list.append(us.id)
+        member_list = []
+        if len(r_user) > 0:
+            for i in r_user:
+                us = User.objects.get(username=i)
+                member_list.append(us.id)
+        if len(uneuser) > 0:
+            for i in uneuser:
+                us = User.objects.get(username=i)
+                member_list.append(us.id)
 
-    users = []
-    uneusers = []
-    r_users = []
-    for i in users_lst:
-        users.append(User.objects.filter(username=i))
-    for i in uneuser:
-        uneusers.append(User.objects.filter(username=i))
-    for i in r_user:
-        r_users.append(User.objects.filter(username=i))
-    current_user = User.objects.filter(id=request.user.id)[0]
-    expense = Expense()
-    expense.expense_by = current_user
-    expense.expense_name = expense_name
-    expense.amount = amount
-    expense.created_at = date
-    expense.group = g
-    expense.save()
-
-    activity = Activities()
-    activity.group = g
-    activity.user = request.user
-    activity.expense = expense
-    activity.activity = "Added"
-    activity.amount = amount
-    activity.save()
-
-    if split_type == 'split_equally':
-
-        for user in users:
-            expense.users.add(user[0])
-
-        per_person_amount = int(amount) / (len(users))
-
-        lender = Lender()
-        lender.expense = expense
-        lender.lender = User.objects.filter(id=request.user.id)[0]
-        lender.lends = per_person_amount * (len(users) - 1)
-        lender.expense_name = expense_name
-
-        lender.save()
-
+        users = []
+        uneusers = []
+        r_users = []
         for i in users_lst:
-            borrower = Borrower()
-            borrower.expense = expense
-            borrower.borrowers = User.objects.filter(username=i)[0]
-            borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-            borrower.borrows = per_person_amount
-            borrower.expense_name = expense_name
-            borrower.group = g
-            borrower.save()
-
-        own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
-        own_delete.delete()
-
-        context = {'expense_name': expense_name, 'date': date, 'lends': per_person_amount * (len(users) - 1),
-                   'expense': expense}
-
-        return render(request, 'list_expenses.html', context)
-
-    if split_type == 'split_unequally':
-
-        own_amount = request.POST.get('une_value_' + str(request.user.id))
-        for user in uneusers:
-            expense.users.add(user[0])
-
-        lender = Lender()
-        lender.expense = expense
-        lender.lender = User.objects.filter(id=request.user.id)[0]
-        lender.lends = int(amount) - int(own_amount)
-        lender.expense_name = expense_name
-
-        lender.save()
-        j = 0
-
+            users.append(User.objects.filter(username=i))
         for i in uneuser:
-            borrower = Borrower()
-            borrower.expense = expense
-            borrower.borrowers = User.objects.filter(username=i)[0]
-            borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-            borrower.borrows = request.POST.get('une_value_' + str(member_list[j]))
-            borrower.expense_name = expense_name
-            borrower.group = g
-            borrower.save()
-            j = j + 1
-        own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
-        own_delete.delete()
-
-        context = {'expense_name': expense_name, 'date': date, 'lends': (int(amount) - int(own_amount)),
-                   'expense': expense}
-
-        return render(request, 'list_expenses.html', context)
-
-    if split_type == 'split_ratio':
-
-        own_amount = request.POST.get('une_r_value_' + str(request.user.id))
-        for user in r_users:
-            expense.users.add(user[0])
-
-        lender = Lender()
-        lender.expense = expense
-        lender.lender = User.objects.filter(id=request.user.id)[0]
-        lender.lends = int(amount) - int(own_amount)
-        lender.expense_name = expense_name
-
-        lender.save()
-        j = 0
+            uneusers.append(User.objects.filter(username=i))
         for i in r_user:
-            borrower = Borrower()
-            borrower.expense = expense
-            borrower.borrowers = User.objects.filter(username=i)[0]
-            borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
-            borrower.borrows = request.POST.get('une_r_value_' + str(member_list[j]))
-            borrower.expense_name = expense_name
-            borrower.group = g
-            borrower.save()
-            j = j + 1
-        own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
-        own_delete.delete()
+            r_users.append(User.objects.filter(username=i))
+        current_user = User.objects.filter(id=request.user.id)[0]
+        expense = Expense()
+        expense.expense_by = current_user
+        expense.expense_name = expense_name
+        expense.amount = amount
+        expense.created_at = date
+        expense.group = g
+        expense.save()
 
-        context = {'expense_name': expense_name, 'date': date, 'lends': (int(amount) - int(own_amount)),
-                   'expense': expense}
+        activity = Activities()
+        activity.group = g
+        activity.user = request.user
+        activity.expense = expense
+        activity.activity = "Added"
+        activity.amount = amount
+        activity.save()
 
-        return render(request, 'list_expenses.html', context)
+        if split_type == 'split_equally':
+            for user in users:
+                expense.users.add(user[0])
+            per_person_amount = int(amount) / len(users)
+
+            lender = Lender()
+            lender.expense = expense
+            lender.lender = User.objects.filter(id=request.user.id)[0]
+            lender.lends = per_person_amount * (len(users) - 1)
+            lender.expense_name = expense_name
+            lender.save()
+
+            for i in users_lst:
+                borrower = Borrower()
+                borrower.expense = expense
+                borrower.borrowers = User.objects.filter(username=i)[0]
+                borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
+                borrower.borrows = per_person_amount
+                borrower.expense_name = expense_name
+                borrower.group = g
+                borrower.save()
+
+            own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
+            own_delete.delete()
+
+            context = {'expense_name': expense_name, 'date': date, 'lends': per_person_amount * (len(users) - 1),
+                       'expense': expense}
+
+            return render(request, 'list_expenses.html', context)
+
+        if split_type == 'split_unequally':
+            own_amount = request.POST.get('une_value_' + str(request.user.id))
+            for user in uneusers:
+                expense.users.add(user[0])
+
+            lender = Lender()
+            lender.expense = expense
+            lender.lender = User.objects.filter(id=request.user.id)[0]
+            lender.lends = int(amount) - int(own_amount)
+            lender.expense_name = expense_name
+            lender.save()
+
+            j = 0
+            for i in uneuser:
+                borrower = Borrower()
+                borrower.expense = expense
+                borrower.borrowers = User.objects.filter(username=i)[0]
+                borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
+                borrower.borrows = request.POST.get('une_value_' + str(member_list[j]))
+                borrower.expense_name = expense_name
+                borrower.group = g
+                borrower.save()
+                j = j + 1
+
+            own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
+            own_delete.delete()
+
+            context = {'expense_name': expense_name, 'date': date, 'lends': (int(amount) - int(own_amount)),
+                       'expense': expense}
+
+            return render(request, 'list_expenses.html', context)
+
+        if split_type == 'split_ratio':
+            own_amount = request.POST.get('une_r_value_' + str(request.user.id))
+            for user in r_users:
+                expense.users.add(user[0])
+
+            lender = Lender()
+            lender.expense = expense
+            lender.lender = User.objects.filter(id=request.user.id)[0]
+            lender.lends = int(amount) - int(own_amount)
+            lender.expense_name = expense_name
+            lender.save()
+
+            j = 0
+            for i in r_user:
+                borrower = Borrower()
+                borrower.expense = expense
+                borrower.borrowers = User.objects.filter(username=i)[0]
+                borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
+                borrower.borrows = request.POST.get('une_r_value_' + str(member_list[j]))
+                borrower.expense_name = expense_name
+                borrower.group = g
+                borrower.save()
+                j = j + 1
+
+            own_delete = Borrower.objects.get(Q(borrowers_id=request.user.id) & Q(expense=expense))
+            own_delete.delete()
+
+            context = {'expense_name': expense_name, 'date': date, 'lends': (int(amount) - int(own_amount)),
+                       'expense': expense}
+
+            return render(request, 'list_expenses.html', context)
+
 
 @login_required(login_url='login/')
 def edit_page(request):
@@ -188,6 +189,7 @@ def edit_page(request):
     context = {'expense_name': expense_name, 'expense': expense, 'amount': amount, 'group': group_rec, 'users': members,
                'group_id': group_id, 'date': date, 'expense_id': expense_id}
     return render(request, 'edit_expense.html', context)
+
 
 @login_required(login_url='login/')
 def edit_expense(request):
@@ -374,6 +376,7 @@ def edit_expense(request):
 
         return render(request, 'list_expenses.html', context)
 
+
 @login_required(login_url='login/')
 def delete_expense(request):
     expense_id = request.POST.get('expense_id')
@@ -390,5 +393,3 @@ def delete_expense(request):
         activity.activity = "Deleted Expense"
         activity.save()
         return render(request, 'list_expenses.html')
-    else:
-        return render(request, 'error.html')

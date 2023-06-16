@@ -21,7 +21,7 @@
         </script>
     {% endif %}
     </div>
-    <form method="post" action="/user/updateuser/" id="userform" enctype="multipart/form-data">
+    <form method="post" action="/user/user_profile/" id="userform" enctype="multipart/form-data">
         {% csrf_token %}
         <input id="js-file-uploader" class="hidden" name="profile-picture" type="file" accept="image/png, image/jpeg"/>
 

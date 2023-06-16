@@ -1,10 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.db.models import Q, Sum
 from django.shortcuts import render
 import razorpay
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from activites.models import Activities
@@ -24,38 +26,38 @@ def settle_view_group(request):
     return render(request, 'settle_expense_group.html', context={'groups': groups})
 
 
-@login_required(login_url='login/')
-def settle_view(request):
-    group = request.GET.get('group_id')
-    amount = []
-    lender = []
-    lender_id = []
-    expense = list(
-        Expense.live_expense.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
-                                                                                                              flat=True))
-    borrower = list(
-        Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
-            'lender').annotate(
-            total=Sum('borrows')).order_by().values_list('lender__lender__username', 'total', 'lender_id'))
+class SettleView(LoginRequiredMixin, View):
+    login_url = 'login/'
+    template_name = 'settle_up.html'
 
-    for item in borrower:
-        lender.append(item[0])
-        amount.append(item[1])
-        lender_id.append(item[2])
-    borrow_list = zip(lender, amount, lender_id)
-    length = len(lender_id)
-    context = {'borrow_list': borrow_list, 'group': group, 'length': length}
-    return render(request, 'settle_up.html', context)
+    def get(self, request):
+        group = request.GET.get('group_id')
+        amount = []
+        lender = []
+        lender_id = []
+        expense = list(
+            Expense.live_expense.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
+                                                                                                                  flat=True))
+        borrower = list(
+            Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
+                'lender').annotate(
+                total=Sum('borrows')).order_by().values_list('lender__lender__username', 'total', 'lender_id'))
 
+        for item in borrower:
+            lender.append(item[0])
+            amount.append(item[1])
+            lender_id.append(item[2])
+        borrow_list = zip(lender, amount, lender_id)
+        length = len(lender_id)
+        context = {'borrow_list': borrow_list, 'group': group, 'length': length}
+        return render(request, self.template_name, context)
 
-@login_required(login_url='login/')
-def process_settle(request):
-    lender_id = request.POST.get('id')
-    amount = request.POST.get('amount')
-    group = request.POST.get('group')
-    context = {'lender_id': lender_id, 'amount': amount, 'group': group}
-
-    return render(request, 'payments.html', context)
+    def post(self, request):
+        lender_id = request.POST.get('id')
+        amount = request.POST.get('amount')
+        group = request.POST.get('group')
+        context = {'lender_id': lender_id, 'amount': amount, 'group': group}
+        return render(request, 'payments.html', context)
 
 
 @login_required(login_url='login/')

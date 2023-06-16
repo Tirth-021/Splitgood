@@ -1,11 +1,9 @@
 from django.urls import path
 
-from group.views import group_view, create_group, show_group, invite_users, send_invite
+from group.views import show_group, CreateGroupView, InviteUsersView
 
 urlpatterns = [
-    path("group_view/", group_view),
-    path("create_group/", create_group),
+    path("create_group/", CreateGroupView.as_view()),
     path("show_group/", show_group),
-    path("invite_user/", invite_users),
-    path("send_invite/", send_invite),
+    path("invite_user/", InviteUsersView.as_view()),
 ]

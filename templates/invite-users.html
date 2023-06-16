@@ -14,7 +14,7 @@
 {% block content %}
     <div class="container_invite">
         <h4>Invite New Members to Split-good</h4>
-        <form class="simple_form new_user" id="new_user" action="/group/send_invite/" method="post">
+        <form class="simple_form new_user" id="new_user" action="/group/invite_user/" method="post">
             {% csrf_token %}
             <div class="form-group email optional user_email">
                 <label class="form-control-label email optional" for="user_email">Email/User</label>
@@ -42,6 +42,7 @@
         $(document).ready(function () {
             $('.js-example-basic-multiple').select2(
                 {
+                    minimumInputLength: 3,
                     tags: true,
                     tokenSeparators: [',', ' ']
                 }

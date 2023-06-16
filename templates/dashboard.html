@@ -122,7 +122,7 @@
                     </svg>
                     <span>Join Group</span>
                 </li>
-                <a class="nav-link" href="/group/group_view/">
+                <a class="nav-link" href="/group/create_group/">
                     <li class="side-nav__item">
 
                         <svg width="22" height="23" viewBox="0 0 22 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -170,7 +170,7 @@
                     <span>Help &amp; Center</span>
                 </li>
 
-                 <ul class="side-nav">
+                <ul class="side-nav">
                     <a class="nav-link" href="/logout/">
                         <li class="side-nav__item last-item">
                             <svg width="24" height="25" viewBox="0 0 24 25" fill="none"
@@ -233,11 +233,8 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-                {% if groups|length == 0 %}
-                    <h3> Join a group to start sharing or create one</h3>
-                {% endif %}
                 <div class="cards">
-                    {% for i in groups %}
+                    {% for i in page_obj %}
                         <div class="card">
                             <div class="card__image-holder">
                                 <img class="card__image"
@@ -269,6 +266,36 @@
                     {% endfor %}
 
 
+                </div>
+                <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="/home?page=1">&laquo; first</a>
+            <a href="/home?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+        {% if page_obj.number > 3 %}
+            <span class="ellipsis">...</span>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <span class="current-page">{{ i }}</span>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                <a href="/home?page={{ i }}">{{ i }}</a>
+            {% elif i == 1 or i == page_obj.paginator.num_pages %}
+                <a href="/home?page={{ i }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages|add:'3' %}
+            <span class="ellipsis">...</span>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <a href="/home?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="/home?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </span>
                 </div>
             </div>
         </div>

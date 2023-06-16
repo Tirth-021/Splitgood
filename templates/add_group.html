@@ -62,7 +62,9 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        $('.js-example-basic-multiple').select2();
+        $('.js-example-basic-multiple').select2(
+            {minimumInputLength: 3,}
+        );
     });
 </script>
 <script src="{% static 'js/dashboard.js' %}"></script>

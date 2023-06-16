@@ -17,6 +17,11 @@ h1 {
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+#blank{
+    display: none; /* Hidden by default */
+    visibility: hidden;
+}
+
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
