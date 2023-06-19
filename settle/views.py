@@ -7,7 +7,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from group.models import Group
 from django.shortcuts import render
-from settle.utils.utils import online_pay, cash_transaction
+from settle.utils.utils import online_pay, cash_transaction, unsimplify, simplify
 from split.models import Expense, Borrower
 
 razorpay_client = razorpay.Client(
@@ -25,25 +25,13 @@ class SettleView(View):
 
     def get(self, request):
         group = request.GET.get('group_id')
-        amount = []
-        lender = []
-        lender_id = []
-        expense = list(
-            Expense.live_expense.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
-                                                                                                                  flat=True))
-        borrower = list(
-            Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
-                'lender').annotate(
-                total=Sum('borrows')).order_by().values_list('lender__lender__username', 'total', 'lender_id'))
-
-        for item in borrower:
-            lender.append(item[0])
-            amount.append(item[1])
-            lender_id.append(item[2])
-        borrow_list = zip(lender, amount, lender_id)
-        length = len(lender_id)
-        context = {'borrow_list': borrow_list, 'group': group, 'length': length}
-        return render(request, self.template_name, context)
+        g = Group.objects.get(id=group)
+        if not g.is_sd:
+            context = unsimplify(request, group)
+            return render(request, self.template_name, context)
+        else:
+            context = simplify(request, group)
+            return render(request, self.template_name, context)
 
     def post(self, request):
         lender_id = request.POST.get('id')

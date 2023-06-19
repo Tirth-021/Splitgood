@@ -1,14 +1,88 @@
+import razorpay
 from django.contrib import messages
-from django.db.models import Q
+from django.contrib.auth.models import User
+from django.db.models import Q, Sum
 
 from Splitgood import settings
 from activites.models import Activities
 from group.models import Group
-from settle.views import razorpay_client
-from split.models import Borrower
+from split.models import Borrower, Lender, Expense
 
+
+def unsimplify(request,group):
+    amount = []
+    lender = []
+    lender_id = []
+    expense = list(
+        Expense.live_expense.filter(Q(group=group) & Q(users=request.user) & Q(is_deleted=False)).values_list('id',
+                                                                                                              flat=True))
+    borrower = list(
+        Borrower.objects.filter(Q(expense__in=expense) & Q(borrowers=request.user.id) & Q(is_paid=False)).values(
+            'lender').annotate(
+            total=Sum('borrows')).order_by().values_list('lender__lender__username', 'total', 'lender_id'))
+
+    for item in borrower:
+        lender.append(item[0])
+        amount.append(item[1])
+        lender_id.append(item[2])
+    borrow_list = zip(lender, amount, lender_id)
+    length = len(lender_id)
+    return {'borrow_list': borrow_list, 'group': group, 'length': length}
+
+
+def simplify(request,g):
+
+    # Calculate group-specific simplified debts logic goes here
+    group = Group.objects.get(id=g)
+    # Get all users in the group
+    users = group.users.all()
+
+    # Create a dictionary to store group-specific simplified debts
+    simplified_debts = {}
+
+    # Iterate through all users
+    for user in users:
+        simplified_debts[user] = {}
+
+    # Get expenses in the group where the user is the payer
+        expenses_as_payer = Lender.objects.filter(expense__group_id=group, lender=User.objects.get(id=user.id))
+
+        # Calculate the total amount paid by the user
+        total_paid = expenses_as_payer.aggregate(Sum('lends'))['lends__sum']
+
+        # Get transactions in the group where the user is the lender
+        transactions_as_lender = Expense.objects.filter(group=group, lender=Lender.objects.get(id=user.id))
+
+        # Calculate the total amount lent by the user
+        total_lent = transactions_as_lender.aggregate(Sum('amount'))['amount__sum']
+
+        # Iterate through all other users
+        for other_user in users:
+            if other_user != user:
+                simplified_debts[user][other_user] = 0
+
+            # Get transactions in the group where the user is the borrower from the other user
+            transactions_as_borrower = Borrower.objects.filter(group=group, borrowers=User.objects.get(id=user.id))
+
+            # Calculate the total amount borrowed by the user from the other user
+            total_borrowed = transactions_as_borrower.aggregate(Sum('borrows'))['borrows__sum']
+
+            # Calculate the net amount owed between the user and the other user
+            net_amount = total_borrowed - total_paid
+
+            simplified_debts[user][other_user] = net_amount
+
+    # Pass the group-specific simplified debts to the template for rendering
+    context = {
+        'group': group,
+        'simplified_debts': simplified_debts
+    }
+
+    return context
 
 def online_pay(request):
+    razorpay_client = razorpay.Client(
+        auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
     lender_id = request.POST.get('lender_id')
     amount = request.POST.get('amount')
     group = request.POST.get('group')
