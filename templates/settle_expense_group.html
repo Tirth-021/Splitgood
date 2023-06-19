@@ -12,7 +12,7 @@
     <div class="list-group">
         {% for i in groups %}
             <button type="button" class="btn btn-primary btn-lg active">
-                <a href="/settle/transactions?group_id={{ i.id }}">{{ i.group_name }}</a></button>
+                <a href="/settle/process_settle?group_id={{ i.id }}">{{ i.group_name }}</a></button>
         {% endfor %}
     </div>
 {% endblock %}

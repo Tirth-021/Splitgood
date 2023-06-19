@@ -21,63 +21,102 @@
                 </div>
                 <div class="single-post-content">
                     <table class="events-list">
-                        {% for i in activity %}
+                        {% for i in page_obj %}
                             <tr id="data">
-                                 {% if i.activity == "Paid" and i.user__username|check_user:request.user.username == "You"  %}
-                                <td>
-                                    <div class="event-date">
-                                        <div class="event-day" id="date">
-                                            {{ i.date|give_date }}
+                                {% if i.activity == "Paid" and i.user__username|check_user:request.user.username == "You" %}
+                                    <td>
+                                        <div class="event-date">
+                                            <div class="event-day" id="date">
+                                                {{ i.date|give_date }}
+                                            </div>
+                                            <div class="event-month" id="month">
+                                                {{ i.date|give_month }}
+                                            </div>
                                         </div>
-                                        <div class="event-month" id="month">
-                                            {{ i.date|give_month }}
+                                        <div class="event-date">
+                                            <div class="event-month">
+                                                {{ i.date|give_time }}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="event-date">
-                                         <div class="event-month">
-                                            {{ i.date|give_time }}
+                                    </td>
+                                {% elif i.activity != "Paid" %}
+                                    <td>
+                                        <div class="event-date">
+                                            <div class="event-day" id="date">
+                                                {{ i.date|give_date }}
+                                            </div>
+                                            <div class="event-month" id="month">
+                                                {{ i.date|give_month }}
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                 {% elif i.activity != "Paid" %}
-                                <td>
-                                    <div class="event-date">
-                                        <div class="event-day" id="date">
-                                            {{ i.date|give_date }}
+                                        <div class="event-date" id="time">
+                                            <div class="event-month">
+                                                {{ i.date|give_time }}
+                                            </div>
                                         </div>
-                                        <div class="event-month" id="month">
-                                            {{ i.date|give_month }}
-                                        </div>
-                                    </div>
-                                    <div class="event-date" id="time">
-                                         <div class="event-month">
-                                            {{ i.date|give_time }}
-                                        </div>
-                                    </div>
-                                </td>
+                                    </td>
+                                    {% else %}
+                                    <td><p class="data" id="blank">{{ i }}</p></td>
                                 {% endif %}
 
-                                {% if i.activity == "Paid" and i.user__username|check_user:request.user.username == "You"  %}
-                                <td>
-                                    <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;{{ i.activity }}&nbsp;&nbsp;&nbsp;&nbsp; {{ i.paid_to__lender__username }}&nbsp;&nbsp;&nbsp;&nbsp; with &nbsp;&nbsp;&nbsp;&nbsp;amount  &nbsp;&nbsp;&nbsp;&nbsp;{{ i.amount }}&nbsp;&nbsp;&nbsp;&nbsp;
-                                    in &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
-                                </td>
+                                {% if i.activity == "Paid" and i.user__username|check_user:request.user.username == "You" %}
+                                    <td>
+                                        <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;{{ i.activity }}&nbsp;&nbsp;&nbsp;&nbsp; {{ i.paid_to__lender__username }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        with &nbsp;&nbsp;&nbsp;&nbsp;amount &nbsp;&nbsp;&nbsp;&nbsp;{{ i.amount }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        in &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
+                                    </td>
                                 {% elif i.activity == "Added" or i.activity == "Edited" %}
-                                <td>
-                                    <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;{{ i.activity }}&nbsp;&nbsp;&nbsp;&nbsp; expense  &nbsp;&nbsp;&nbsp;&nbsp;{{ i.expense__expense_name }}&nbsp;&nbsp;&nbsp;&nbsp; with &nbsp;&nbsp;&nbsp;&nbsp;amount  &nbsp;&nbsp;&nbsp;&nbsp;{{ i.amount }}&nbsp;&nbsp;&nbsp;&nbsp;
-                                    in &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
-                                </td>
-                                  {% elif i.activity == "Added User" %}
-                                <td>
-                                    <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;Added &nbsp;&nbsp;&nbsp;&nbsp;{{ i.added_id__username|check_user:request.user.username }}&nbsp;&nbsp;&nbsp;&nbsp;
-                                    to &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
-                                </td>
+                                    <td>
+                                        <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;{{ i.activity }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        expense &nbsp;&nbsp;&nbsp;&nbsp;{{ i.expense__expense_name }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        with &nbsp;&nbsp;&nbsp;&nbsp;amount &nbsp;&nbsp;&nbsp;&nbsp;{{ i.amount }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        in &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
+                                    </td>
+                                {% elif i.activity == "Added User" %}
+                                    <td>
+                                        <b>{{ i.user__username|check_user:request.user.username }}</b> &nbsp;&nbsp;&nbsp;&nbsp;Added
+                                        &nbsp;&nbsp;&nbsp;&nbsp;{{ i.added_id__username|check_user:request.user.username }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        to &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
+                                    </td>
+                                  {% else %}
+                                    <td><p class="data" id="blank">{{ i }}</p></td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
                     </table>
 
                 </div>
+                <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="/activities/show_activities/?page=1">&laquo; first</a>
+            <a href="/activities/show_activities/?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+        {% if page_obj.number > 3 %}
+            <span class="ellipsis">...</span>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <span class="current-page">{{ i }}</span>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                <a href="/activities/show_activities/?page={{ i }}">{{ i }}</a>
+            {% elif i == 1 or i == page_obj.paginator.num_pages %}
+                <a href="/activities/show_activities/?page={{ i }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages|add:'3' %}
+            <span class="ellipsis">...</span>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <a href="/activities/show_activities/?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="/activities/show_activities/?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </span>
+                </div>
+
             </div>
         </div>
     </div>

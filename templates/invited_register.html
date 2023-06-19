@@ -22,20 +22,20 @@
       <div id="username" style="font-size: 24px; line-height: 140%; margin: 30px 0 5px 10%">
         Hi there! My name is
       </div>
-      <input tabindex="1" autocomplete="off" style="font-size: 32px; height: 42px;" onchange="showSecondaryFields()" onkeyup="showSecondaryFields()" type="text" value="" name="username" id="user_name">
+      <input tabindex="1" autocomplete="off" style="font-size: 32px; height: 42px;" onchange="showSecondaryFields()" onkeyup="showSecondaryFields()" type="text" value="" name="username" id="user_name" required>
         <input type="hidden" name="uuid" value="{{ uuid }}">
       <div class="secondary_fields" style="display: none;">
         <div style="margin: 30px 0 5px 10%;">
           Here’s my <strong>email address</strong>:
           <br>
         </div>
-        <input tabindex="2" type="email" name="email" id="user_email">
+        <input tabindex="2" type="email" name="email" id="user_email" required>
 
         <div id="password" style="margin: 30px 0 5px 10%;">
           And here’s my <strong>password</strong>:
           <br>
         </div>
-         <input tabindex="3" type="password" name="password" id="user_password">
+         <input tabindex="3" type="password" name="password" id="user_password" required>
       </div>
 
 

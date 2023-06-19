@@ -30,7 +30,7 @@
                             <legend><span class="number">1</span> Create Group</legend>
 
                             <label for="projectname">Group Name:</label>
-                            <input type="text" id="projectname" name="group_name" placeholder="For ex. Apna Khata">
+                            <input type="text" id="projectname" name="group_name" placeholder="For ex. Apna Khata" required>
 
 
                             <label for="People">People:</label>
@@ -62,7 +62,9 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
-        $('.js-example-basic-multiple').select2();
+        $('.js-example-basic-multiple').select2(
+            {minimumInputLength: 3,}
+        );
     });
 </script>
 <script src="{% static 'js/dashboard.js' %}"></script>
