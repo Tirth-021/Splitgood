@@ -1,18 +1,14 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core import mail
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render
 from django.views import View
-
-from Splitgood import settings
 from activites.models import Activities
 from group.models import Group
+from group.utils.utils import send_email
 
 
-class CreateGroupView(LoginRequiredMixin, View):
-    login_url = 'login/'
+class CreateGroupView(View):
 
     def get(self, request):
         users = User.objects.exclude(Q(username=request.user.username) | Q(is_superuser=True))
@@ -41,11 +37,14 @@ class CreateGroupView(LoginRequiredMixin, View):
             activity.save()
         group.users.add(request.user)
         group.save()
+        groups = Group.objects.filter(users=request.user.id)
+        paginator = Paginator(groups, 6)  # Create a Paginator instance with 6 items per page
+        page_number = request.GET.get('page', 1)  # Get the current page number from the request's query parameters
+        page_obj = paginator.get_page(page_number)
+        context = {'page_obj': page_obj}
+        return render(request, 'dashboard.html', context)
 
-        return render(request, 'dashboard.html')
 
-
-@login_required(login_url='login/')
 def show_group(request):
     group_id = request.GET.get('id')
     group = Group.objects.filter(id=group_id)[0]
@@ -57,7 +56,7 @@ def show_group(request):
     return render(request, 'group_view.html', context)
 
 
-class InviteUsersView(LoginRequiredMixin, View):
+class InviteUsersView(View):
     template_name = 'invite-users.html'
 
     def get(self, request):
@@ -87,22 +86,8 @@ class InviteUsersView(LoginRequiredMixin, View):
                 send_email(i, uuid, group_name)
 
         groups = Group.objects.filter(users=request.user.id)
-        context = {'groups': groups}
+        paginator = Paginator(groups, 6)  # Create a Paginator instance with 6 items per page
+        page_number = request.GET.get('page', 1)  # Get the current page number from the request's query parameters
+        page_obj = paginator.get_page(page_number)
+        context = {'page_obj': page_obj}
         return render(request, 'dashboard.html', context)
-
-
-def send_email(email, uuid, group_name):
-    uri = f"http://127.0.0.1:8000/invited-register/{uuid}"
-    connection = mail.get_connection()
-    subject = "Welcome to Split-good "
-    message = "We are glad to have you here! \n" \
-              "You are invited to join " \
-              + group_name + "\nYou can signup on " + uri
-    email = mail.EmailMessage(
-        subject,
-        message,
-        settings.EMAIL_HOST_USER,
-        [email],
-        connection=connection,
-    )
-    email.send()

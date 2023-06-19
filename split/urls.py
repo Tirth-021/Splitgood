@@ -1,10 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 
-from split.views import add_expense, edit_page, edit_expense, ExpenseView
+from split.views import add_expense, ExpenseView, EditExpenseView
 
 urlpatterns = [
-    path("add_expense/", add_expense),
-    path("split_expense/", ExpenseView.as_view()),
-    path("edit_expense/", edit_page),
-    path("process_edit/", edit_expense),
+    path("add_expense/", login_required(add_expense, login_url='/')),
+    path("split_expense/", login_required(ExpenseView.as_view(), login_url='/')),
+    path("edit_expense/", login_required(EditExpenseView.as_view(), login_url='/')),
 ]

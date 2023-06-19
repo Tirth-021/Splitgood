@@ -1,9 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 
 from group.views import show_group, CreateGroupView, InviteUsersView
 
 urlpatterns = [
-    path("create_group/", CreateGroupView.as_view()),
-    path("show_group/", show_group),
-    path("invite_user/", InviteUsersView.as_view()),
+    path("create_group/", login_required(CreateGroupView.as_view(), login_url='/')),
+    path("show_group/", login_required(show_group, login_url='/')),
+    path("invite_user/", login_required(InviteUsersView.as_view(), login_url='/')),
 ]

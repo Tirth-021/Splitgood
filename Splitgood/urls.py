@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import path, include
 
 from django.conf import settings
@@ -28,7 +29,7 @@ urlpatterns = [
     path("registration/", registration, name="registration"),
     path("login/", login_view),
     path("logout/", logout_view),
-    path('invited-register/<uuid>/', InvitedRegisterView.as_view(), name='invited_register'),
+    path('invited-register/<uuid>/', login_required(InvitedRegisterView.as_view()), name='invited_register'),
     path('group/', include('group.urls')),
     path('split/', include('split.urls')),
     path('settle/', include('settle.urls')),

@@ -1,33 +1,26 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db.models import Q, Sum
-from django.shortcuts import render
 import razorpay
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-
-from activites.models import Activities
 from group.models import Group
 from django.shortcuts import render
-
-from split.models import Expense, Borrower, Lender
+from settle.utils.utils import online_pay, cash_transaction
+from split.models import Expense, Borrower
 
 razorpay_client = razorpay.Client(
     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
 
 
-@login_required(login_url='login/')
 def settle_view_group(request):
     groups = Group.objects.filter(users=request.user)
 
     return render(request, 'settle_expense_group.html', context={'groups': groups})
 
 
-class SettleView(LoginRequiredMixin, View):
-    login_url = 'login/'
+class SettleView(View):
     template_name = 'settle_up.html'
 
     def get(self, request):
@@ -60,64 +53,19 @@ class SettleView(LoginRequiredMixin, View):
         return render(request, 'payments.html', context)
 
 
-@login_required(login_url='login/')
 def process_payment(request):
     payment_method = request.POST.get('payment-method')
     if payment_method == 'online':
-        lender_id = request.POST.get('lender_id')
-        amount = request.POST.get('amount')
-        group = request.POST.get('group')
-        final_amount = int(amount) * 100
-
-        currency = 'INR'
-        # Create a Razorpay Order
-        razorpay_order = razorpay_client.order.create(dict(amount=final_amount,
-                                                           currency=currency,
-                                                           payment_capture='0'))
-
-        razorpay_order_id = razorpay_order['id']
-        callback_url = 'paymenthandler/'
-        context = {
-            'razorpay_order_id': razorpay_order_id,
-            'razorpay_merchant_key': settings.RAZOR_KEY_ID,
-            'razorpay_amount': final_amount,
-            'currency': currency,
-            'callback_url': callback_url,
-        }
-
-        borrow_transaction = Borrower.objects.filter(
-            Q(borrowers=request.user.id) & Q(lender=lender_id) & Q(is_paid=False) & Q(group=group))
-        for i in borrow_transaction:
-            i.is_paid = True
-            i.save()
-        activity = Activities()
-        activity.activity = "Paid"
-        activity.amount = int(amount)
-        g = Group.objects.get(group=group)
-        activity.group = g
-        activity.user = request.user
-        activity.save()
-
+        context = online_pay(request)
         return render(request, 'payment_online.html', context=context)
     else:
-        lender_id = request.POST.get('lender_id')
-        group = request.POST.get('group')
-        amount = request.POST.get('amount')
-        borrow_transaction = Borrower.objects.filter(
-            Q(borrowers=request.user.id) & Q(lender=lender_id) & Q(is_paid=False) & Q(group=group))
-        for i in borrow_transaction:
-            i.is_paid = True
-            i.save()
-        activity = Activities()
-        activity.activity = "Paid"
-        activity.amount = int(amount)
-        g = Group.objects.get(id=group)
-        activity.group = g
-        activity.user = request.user
-        activity.paid_to = Lender.objects.filter(id=lender_id)[0]
-        activity.save()
-        messages.success(request, "You are settled up.")
-        return render(request, 'dashboard.html')
+        cash_transaction(request)
+        groups = Group.objects.filter(users=request.user.id)
+        paginator = Paginator(groups, 6)  # Create a Paginator instance with 6 items per page
+        page_number = request.GET.get('page', 1)  # Get the current page number from the request's query parameters
+        page_obj = paginator.get_page(page_number)
+        context = {'page_obj': page_obj}
+        return render(request, 'dashboard.html', context)
 
 
 @csrf_exempt
