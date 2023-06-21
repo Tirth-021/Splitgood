@@ -1,7 +1,12 @@
+import heapq
+from collections import defaultdict
+
+import networkx as nx
 import razorpay
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Value
+from django.db.models.functions import Coalesce
 
 from Splitgood import settings
 from activites.models import Activities
@@ -9,7 +14,7 @@ from group.models import Group
 from split.models import Borrower, Lender, Expense
 
 
-def unsimplify(request,group):
+def unsimplify(request, group):
     amount = []
     lender = []
     lender_id = []
@@ -30,55 +35,37 @@ def unsimplify(request,group):
     return {'borrow_list': borrow_list, 'group': group, 'length': length}
 
 
-def simplify(request,g):
+def simplify(request, g):
+    net_amounts = defaultdict(int)  # {user: net_amount}
+    for lender in Lender.objects.filter(expense__group=g):
+        net_amounts[lender.lender] += lender.lends
+        for borrower in Borrower.objects.filter(lender__id=lender.id):
+            net_amounts[borrower.borrowers] -= borrower.borrows
 
-    # Calculate group-specific simplified debts logic goes here
-    group = Group.objects.get(id=g)
-    # Get all users in the group
-    users = group.users.all()
+    # Step 2: Separate debtors and creditors
+    debtors = []  # [(amount, user)]
+    creditors = []  # [(amount, user)]
+    for user, amount in net_amounts.items():
+        if amount < 0:
+            heapq.heappush(debtors, (-amount, user))
+        elif amount > 0:
+            heapq.heappush(creditors, (-amount, user))  # Use negative amounts to get a max heap
+    # Step 3: Match debtors and creditors
+    transactions = []  # [(debtor, creditor, amount)]
+    while debtors and creditors:
+        debtor_amount, debtor_user = heapq.heappop(debtors)
+        creditor_amount, creditor_user = heapq.heappop(creditors)
+        transaction_amount = min(debtor_amount, -creditor_amount)
 
-    # Create a dictionary to store group-specific simplified debts
-    simplified_debts = {}
+        transactions.append((debtor_user, creditor_user, transaction_amount))
 
-    # Iterate through all users
-    for user in users:
-        simplified_debts[user] = {}
+        if -debtor_amount + transaction_amount < 0:
+            heapq.heappush(debtors, (debtor_amount + transaction_amount, debtor_user))
+        if -creditor_amount - transaction_amount > 0:
+            heapq.heappush(creditors, (creditor_amount + transaction_amount, creditor_user))
 
-    # Get expenses in the group where the user is the payer
-        expenses_as_payer = Lender.objects.filter(expense__group_id=group, lender=User.objects.get(id=user.id))
+    return transactions
 
-        # Calculate the total amount paid by the user
-        total_paid = expenses_as_payer.aggregate(Sum('lends'))['lends__sum']
-
-        # Get transactions in the group where the user is the lender
-        transactions_as_lender = Expense.objects.filter(group=group, lender=Lender.objects.get(id=user.id))
-
-        # Calculate the total amount lent by the user
-        total_lent = transactions_as_lender.aggregate(Sum('amount'))['amount__sum']
-
-        # Iterate through all other users
-        for other_user in users:
-            if other_user != user:
-                simplified_debts[user][other_user] = 0
-
-            # Get transactions in the group where the user is the borrower from the other user
-            transactions_as_borrower = Borrower.objects.filter(group=group, borrowers=User.objects.get(id=user.id))
-
-            # Calculate the total amount borrowed by the user from the other user
-            total_borrowed = transactions_as_borrower.aggregate(Sum('borrows'))['borrows__sum']
-
-            # Calculate the net amount owed between the user and the other user
-            net_amount = total_borrowed - total_paid
-
-            simplified_debts[user][other_user] = net_amount
-
-    # Pass the group-specific simplified debts to the template for rendering
-    context = {
-        'group': group,
-        'simplified_debts': simplified_debts
-    }
-
-    return context
 
 def online_pay(request):
     razorpay_client = razorpay.Client(
@@ -117,6 +104,7 @@ def online_pay(request):
     activity.user = request.user
     activity.save()
     return context
+
 
 def cash_transaction(request):
     lender_id = request.POST.get('lender_id')

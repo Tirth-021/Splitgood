@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from group.models import Group
 from django.shortcuts import render
 from settle.utils.utils import online_pay, cash_transaction, unsimplify, simplify
-from split.models import Expense, Borrower
+from split.models import Expense, Borrower, Lender
 
 razorpay_client = razorpay.Client(
     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
@@ -30,7 +30,23 @@ class SettleView(View):
             context = unsimplify(request, group)
             return render(request, self.template_name, context)
         else:
-            context = simplify(request, group)
+            amount = []
+            lender = []
+            lender_id = []
+            user = request.user
+            transactions = simplify(request, group)
+            for i in transactions:
+                if i[0] == user:
+                    lender.append(i[1])
+                    amount.append(i[2])
+                    ids = Lender.objects.filter(Q(lender__username=i[1]) & Q(expense__group=group)).values_list('id',
+                                                                                                                flat=True)
+                    lender_id.append(ids)
+
+            borrow_list = zip(lender, amount, lender_id)
+            length = len(lender_id)
+            context = {'borrow_list': borrow_list, 'group': group, 'length': length}
+            breakpoint()
             return render(request, self.template_name, context)
 
     def post(self, request):
