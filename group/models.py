@@ -12,6 +12,7 @@ class Group(models.Model):
     users = models.ManyToManyField(User, related_name='group')
     created_at = models.DateTimeField(auto_now_add=True)
     uuid = models.UUIDField(unique=True, null=True, default=uuid.uuid4)
+    is_simplified = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'group'

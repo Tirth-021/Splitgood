@@ -23,14 +23,26 @@
                 <div class="nav-bar">
                     <ul>
                         <li><a href="/split/split_expense/?group_id={{ group_id }}">Add-expense</a></li>
-                        <li><a href="/settle/transactions/?group_id={{ group_id }}">Settle Up</a></li>
+                        <li><a href="/settle/process_settle/?group_id={{ group_id }}">Settle Up</a></li>
                         <li><a href="/group/invite_user/?group_id={{ group_id }}">Invite-users</a></li>
+                        <p>Simplified Debts</p>
+                        {% if flag == True %}
+                            <label class="switch">
+                                <input type="checkbox" name="sd_toggle" id="slider" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        {% else %}
+                            <label class="switch">
+                                <input type="checkbox" name="sd_toggle" id="slider">
+                                <span class="slider round"></span>
+                            </label>
+                        {% endif %}
                     </ul>
                 </div>
 
                 <div class="single-post-content">
                     <table class="events-list">
-                        {% for i in activity %}
+                        {% for i in page_obj %}
                             <tr id="data">
                                 <td>
                                     <div class="event-date">
@@ -82,6 +94,36 @@
                     </table>
 
                 </div>
+                <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="/group/show_group/?page=1&id={{ group_id }}">&laquo; first</a>
+            <a href="/group/show_group/?page={{ page_obj.previous_page_number }}&id={{ group_id }}">previous</a>
+        {% endif %}
+        {% if page_obj.number > 3 %}
+            <span class="ellipsis">...</span>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <span class="current-page">{{ i }}</span>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                <a href="/group/show_group/?page={{ i }}&id={{ group_id }}">{{ i }}</a>
+            {% elif i == 1 or i == page_obj.paginator.num_pages %}
+                <a href="/group/show_group/?page={{ i }}&id={{ group_id }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages|add:'3' %}
+            <span class="ellipsis">...</span>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <a href="/group/show_group/?page={{ page_obj.next_page_number }}&id={{ group_id }}">Next</a>
+            <a href="/group/show_group/?page={{ page_obj.paginator.num_pages }}&id={{ group_id }}">Last &raquo;</a>
+        {% endif %}
+    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -98,6 +140,16 @@
         </symbol>
 
     </svg>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"
+            integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script>
+        let slider = document.getElementById('slider');
+        slider.addEventListener('click', function () {
+            console.log('Hello')
+            window.location.href = '/group/simply/?group_id={{ group_id }}';
+        });
+
+    </script>
 {% endblock %}
 
 </body>

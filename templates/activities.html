@@ -55,7 +55,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    {% else %}
+                                {% else %}
                                     <td><p class="data" id="blank">{{ i }}</p></td>
                                 {% endif %}
 
@@ -78,7 +78,7 @@
                                         &nbsp;&nbsp;&nbsp;&nbsp;{{ i.added_id__username|check_user:request.user.username }}&nbsp;&nbsp;&nbsp;&nbsp;
                                         to &nbsp;&nbsp;&nbsp;&nbsp;<b>{{ i.group__group_name }}</b>
                                     </td>
-                                  {% else %}
+                                {% else %}
                                     <td><p class="data" id="blank">{{ i }}</p></td>
                                 {% endif %}
                             </tr>

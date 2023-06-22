@@ -47,12 +47,16 @@ class CreateGroupView(View):
 
 def show_group(request):
     group_id = request.GET.get('id')
-    group = Group.objects.filter(id=group_id)[0]
+    group = Group.objects.get(id=group_id)
+    flag = group.is_sd
     activity = Activities.objects.filter(group=group).values("activity", "amount", "expense__expense_name",
                                                              "group__group_name", "user__username", "date",
                                                              "paid_to__lender__username",
                                                              "added_id__username").order_by("-date")
-    context = {'activity': activity, 'group_id': group_id}
+    paginator = Paginator(activity, 7)  # Create a Paginator instance with 7 items per page
+    page_number = request.GET.get('page', 1)  # Get the current page number from the request's query parameters
+    page_obj = paginator.get_page(page_number)
+    context = {"page_obj": page_obj, 'group_id': group_id, 'flag': flag}
     return render(request, 'group_view.html', context)
 
 
@@ -91,3 +95,23 @@ class InviteUsersView(View):
         page_obj = paginator.get_page(page_number)
         context = {'page_obj': page_obj}
         return render(request, 'dashboard.html', context)
+
+
+def activate_sd(request):
+    group = request.GET.get('group_id')
+    g = Group.objects.get(id=group)
+    if g.is_sd == True:
+        g.is_sd = False
+    else:
+        g.is_sd = True
+    g.save()
+    activity = Activities.objects.filter(group=g).values("activity", "amount", "expense__expense_name",
+                                                         "group__group_name", "user__username", "date",
+                                                         "paid_to__lender__username",
+                                                         "added_id__username").order_by("-date")
+    paginator = Paginator(activity, 7)  # Create a Paginator instance with 7 items per page
+    page_number = request.GET.get('page', 1)  # Get the current page number from the request's query parameters
+    page_obj = paginator.get_page(page_number)
+    flag = g.is_sd
+    context = {"page_obj": page_obj, 'group_id': group, 'flag': flag}
+    return render(request, 'group_view.html', context)

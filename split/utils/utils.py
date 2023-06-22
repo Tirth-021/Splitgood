@@ -70,7 +70,7 @@ def split(request):
             borrower = Borrower()
             borrower.expense = expense
             borrower.borrowers = User.objects.filter(username=i)[0]
-            borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
+            borrower.lender = lender
             borrower.borrows = per_person_amount
             borrower.expense_name = expense_name
             borrower.group = g
@@ -101,7 +101,7 @@ def split(request):
             borrower = Borrower()
             borrower.expense = expense
             borrower.borrowers = User.objects.filter(username=i)[0]
-            borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
+            borrower.lender = lender
             borrower.borrows = request.POST.get('une_value_' + str(member_list[j]))
             borrower.expense_name = expense_name
             borrower.group = g
@@ -133,7 +133,7 @@ def split(request):
             borrower = Borrower()
             borrower.expense = expense
             borrower.borrowers = User.objects.filter(username=i)[0]
-            borrower.lender = Lender.objects.filter(lender_id=request.user.id)[0]
+            borrower.lender = lender
             borrower.borrows = request.POST.get('une_r_value_' + str(member_list[j]))
             borrower.expense_name = expense_name
             borrower.group = g
