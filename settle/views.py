@@ -46,7 +46,6 @@ class SettleView(View):
             borrow_list = zip(lender, amount, lender_id)
             length = len(lender_id)
             context = {'borrow_list': borrow_list, 'group': group, 'length': length}
-            breakpoint()
             return render(request, self.template_name, context)
 
     def post(self, request):

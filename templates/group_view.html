@@ -25,10 +25,17 @@
                         <li><a href="/split/split_expense/?group_id={{ group_id }}">Add-expense</a></li>
                         <li><a href="/settle/process_settle/?group_id={{ group_id }}">Settle Up</a></li>
                         <li><a href="/group/invite_user/?group_id={{ group_id }}">Invite-users</a></li>
+                        <p>Simplified Debts</p>
                         {% if flag == True %}
-                        <li><a href="/group/simply/?group_id={{ group_id }}">Turn off simplified debts</a> </li>
+                            <label class="switch">
+                                <input type="checkbox" name="sd_toggle" id="slider" checked>
+                                <span class="slider round"></span>
+                            </label>
                         {% else %}
-                         <li><a href="/group/simply/?group_id={{ group_id }}">Turn on simplified debts</a> </li>
+                            <label class="switch">
+                                <input type="checkbox" name="sd_toggle" id="slider">
+                                <span class="slider round"></span>
+                            </label>
                         {% endif %}
                     </ul>
                 </div>
@@ -87,7 +94,7 @@
                     </table>
 
                 </div>
-            <div class="pagination">
+                <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="/group/show_group/?page=1&id={{ group_id }}">&laquo; first</a>
@@ -133,6 +140,16 @@
         </symbol>
 
     </svg>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"
+            integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script>
+        let slider = document.getElementById('slider');
+        slider.addEventListener('click', function () {
+            console.log('Hello')
+            window.location.href = '/group/simply/?group_id={{ group_id }}';
+        });
+
+    </script>
 {% endblock %}
 
 </body>
